@@ -1,6 +1,6 @@
 ﻿
 using Educati;
-using Educati.Helpers;
+using Educati.Azure.Function.Api.Helpers;
 using AzureFunctions.Extensions.Swashbuckle;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using System.Reflection;

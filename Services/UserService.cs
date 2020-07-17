@@ -1,6 +1,6 @@
-﻿using Educati.Entites;
-using Educati.Helpers;
-using Educati.Models;
+﻿using Educati.Azure.Function.Api.Entites;
+using Educati.Azure.Function.Api.Helpers;
+using Educati.Azure.Function.Api.Models;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
-namespace Educati.Services
+namespace Educati.Azure.Function.Api.Services
 {
     public class UserService: IUserService
     {

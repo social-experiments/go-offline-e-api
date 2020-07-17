@@ -1,6 +1,6 @@
-﻿using Educati.Entites;
+﻿using Educati.Azure.Function.Api.Entites;
 
-namespace Educati.Models
+namespace Educati.Azure.Function.Api.Models
 {
     public class AuthenticateResponse
     {

@@ -1,5 +1,5 @@
-﻿using Educati.Helpers.Enums;
-using Educati.Models;
+﻿using Educati.Azure.Function.Api.Helpers.Enums;
+using Educati.Azure.Function.Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Educati.Helpers.Attributes
+namespace Educati.Azure.Function.Api.Helpers.Attributes
 {
 
     /// <summary>
