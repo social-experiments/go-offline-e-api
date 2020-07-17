@@ -1,4 +1,4 @@
-﻿namespace Educati.Helpers.Enums
+﻿namespace Educati.Azure.Function.Api.Helpers.Enums
 {
     public enum AccessTokenStatus
     {

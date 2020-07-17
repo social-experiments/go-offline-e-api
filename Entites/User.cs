@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Educati.Entites
+namespace Educati.Azure.Function.Api.Entites
 {
     public class User
     {

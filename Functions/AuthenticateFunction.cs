@@ -1,5 +1,5 @@
-using Educati.Models;
-using Educati.Services;
+using Educati.Azure.Function.Api.Models;
+using Educati.Azure.Function.Api.Services;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Educati.Functions
+namespace Educati.Azure.Function.Api.Functions
 {
     public class AuthenticateFunction
     {

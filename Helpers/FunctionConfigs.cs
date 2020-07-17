@@ -1,4 +1,4 @@
-﻿namespace Educati.Helpers
+﻿namespace Educati.Azure.Function.Api.Helpers
 {
     public static class FunctionConfigs
     {

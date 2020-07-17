@@ -1,7 +1,7 @@
-﻿using Educati.Services;
+﻿using Educati.Azure.Function.Api.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Educati.Helpers
+namespace Educati.Azure.Function.Api.Helpers
 {
     public class ServiceCollections
     {

@@ -1,8 +1,8 @@
-﻿using Educati.Helpers.Enums;
+﻿using Educati.Azure.Function.Api.Helpers.Enums;
 using System;
 using System.Security.Claims;
 
-namespace Educati.Models
+namespace Educati.Azure.Function.Api.Models
 {
     /// <summary>
     /// Contains the result of an access token check.

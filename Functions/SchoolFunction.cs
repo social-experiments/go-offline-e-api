@@ -1,5 +1,5 @@
-using Educati.Helpers.Attributes;
-using Educati.Helpers.Enums;
+using Educati.Azure.Function.Api.Helpers.Attributes;
+using Educati.Azure.Function.Api.Helpers.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Educati.Functions
+namespace Educati.Azure.Function.Api.Functions
 {
     public  class SchoolFunction: AuthenticationFilter
     {

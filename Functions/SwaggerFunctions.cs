@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Educati.Functions 
+namespace Educati.Azure.Function.Api.Functions 
 {
     public static class SwaggerFunctions
     {

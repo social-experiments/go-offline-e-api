@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Educati.Models
+namespace Educati.Azure.Function.Api.Models
 {
     public class AuthenticateRequest
     {

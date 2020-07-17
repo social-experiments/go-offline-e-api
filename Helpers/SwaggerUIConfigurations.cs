@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Educati.Helpers
+namespace Educati.Azure.Function.Api.Helpers
 {
     public class SwaggerUIConfigurations
     {

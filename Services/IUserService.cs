@@ -1,8 +1,8 @@
-﻿using Educati.Entites;
-using Educati.Models;
+﻿using Educati.Azure.Function.Api.Entites;
+using Educati.Azure.Function.Api.Models;
 using System.Collections.Generic;
 
-namespace Educati.Services
+namespace Educati.Azure.Function.Api.Services
 {
     public interface IUserService
     {
