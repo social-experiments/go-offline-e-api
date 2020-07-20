@@ -1,10 +1,11 @@
 ﻿using Educati.Azure.Function.Api.Entites;
+using System;
 
 namespace Educati.Azure.Function.Api.Models
 {
     public class AuthenticateResponse
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
@@ -16,7 +17,7 @@ namespace Educati.Azure.Function.Api.Models
             Id = user.Id;
             FirstName = user.FirstName;
             LastName = user.LastName;
-            Username = user.Username;
+            Username = user.UserName;
             Token = token;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Educati.Azure.Function.Api.Services;
+﻿using Aducati.Azure.TableStorage.Repository;
+using Educati.Azure.Function.Api.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Educati.Azure.Function.Api.Helpers
@@ -8,6 +9,8 @@ namespace Educati.Azure.Function.Api.Helpers
         public static void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(FunctionConfigs.TableStorageConnstionString));
+            
         }
     }
 }

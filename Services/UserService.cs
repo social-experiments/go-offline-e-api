@@ -1,4 +1,5 @@
-﻿using Educati.Azure.Function.Api.Entites;
+﻿using Aducati.Azure.TableStorage.Repository;
+using Educati.Azure.Function.Api.Entites;
 using Educati.Azure.Function.Api.Helpers;
 using Educati.Azure.Function.Api.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -13,16 +14,22 @@ namespace Educati.Azure.Function.Api.Services
 {
     public class UserService: IUserService
     {
+        private ITableStorage _tableStorage;
+        public UserService(ITableStorage tableStorage)
+        {
+            _tableStorage = tableStorage;
+        }
         // users hardcoded for simplicity, store in a db with hashed passwords in production applications
         private List<User> _users = new List<User>
         {
-            new User { Id = 1, FirstName = "Test", LastName = "User", Username = "test", Password = "test" }
+            new User { Id = Guid.NewGuid(), FirstName = "Test", LastName = "User", UserName = "test", Password = "test" }
         };
 
         public AuthenticateResponse Authenticate(AuthenticateRequest model)
         {
-            var user = _users.SingleOrDefault(x => x.Username == model.Username && x.Password == model.Password);
-
+            
+            var user = _users.SingleOrDefault(x => x.UserName == model.Username && x.Password == model.Password);
+            _tableStorage.AddAsync("User", user);
             // return null if user not found
             if (user == null) return null;
 
