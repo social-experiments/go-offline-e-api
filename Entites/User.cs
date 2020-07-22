@@ -1,6 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
-using System.Text.Json.Serialization;
 
 namespace Educati.Azure.Function.Api.Entites
 {
@@ -15,9 +15,12 @@ namespace Educati.Azure.Function.Api.Entites
         public User() { }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string UserName { get; set; }
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
 
-        [JsonIgnore]
-        public string Password { get; set; }
+        public string Role { get; set; }
+        public DateTime? Verified { get; set; }
+        public bool IsVerified => Verified.HasValue || PasswordReset.HasValue;
+        public DateTime? PasswordReset { get; set; }
     }
 }
