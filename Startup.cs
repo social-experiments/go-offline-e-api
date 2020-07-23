@@ -37,6 +37,7 @@ namespace Educati
         {
             services.AddAutoMapper(typeof(Startup));
             services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<ISchoolService, SchoolService>();
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(FunctionConfigs.TableStorageConnstionString));
         }
     }

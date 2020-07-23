@@ -1,3 +1,4 @@
+using Educati.Azure.Function.Api.Helpers.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Educati.Azure.Function.Api.Functions
 {
-    public static class AttendanceFunction
+    public  class AttendanceFunction: AuthenticationFilter
     {
         [FunctionName("AttendanceFunction")]
-        public static async Task<IActionResult> Run(
+        public  async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
