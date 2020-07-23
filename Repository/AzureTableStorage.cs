@@ -47,7 +47,6 @@ namespace Aducati.Azure.TableStorage.Repository
         public async Task<IEnumerable<T>> GetAllAsync<T>(string tableName) where T : class, ITableEntity, new()
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
-
             TableContinuationToken token = null;
             var entities = new List<T>();
             do
@@ -88,7 +87,6 @@ namespace Aducati.Azure.TableStorage.Repository
             var table = await EnsureTable(tableName).ConfigureAwait(false);
 
             TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(entity);
-
             TableResult result = await table.ExecuteAsync(insertOrReplaceOperation).ConfigureAwait(false);
 
             return result.Result;
@@ -185,7 +183,6 @@ namespace Aducati.Azure.TableStorage.Repository
         public async Task<object> UpdateAsync(string tableName, ITableEntity entity)
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
-
             TableOperation replaceOperation = TableOperation.Replace(entity);
 
             TableResult result = await table.ExecuteAsync(replaceOperation).ConfigureAwait(false);

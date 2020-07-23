@@ -1,13 +1,16 @@
+using System;
+
 namespace Educati.Azure.Function.Api.Models
 {
-    public class AuthenticateResponse
+    public class AccountResponse
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
-        public string Token { get; set; }
-
+        public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; }
+        public bool IsVerified { get; set; }
     }
 }
