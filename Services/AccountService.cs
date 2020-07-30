@@ -80,7 +80,7 @@ namespace Educati.Azure.Function.Api.Services
                 LastName = model.LastName,
                 Email = model.Email,
                 PasswordHash = BC.HashPassword(model.Password),
-                Role = Role.SuperAdmin.ToString("G"),
+                Role = model.Role,
                 Active = true,
                 Verified = DateTime.UtcNow,
                 PasswordReset = DateTime.UtcNow,
