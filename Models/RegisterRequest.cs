@@ -1,3 +1,4 @@
+using Educati.Azure.Function.Api.Entites;
 using System.ComponentModel.DataAnnotations;
 
 namespace Educati.Azure.Function.Api.Models
@@ -14,6 +15,10 @@ namespace Educati.Azure.Function.Api.Models
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        [Required]
+        [EnumDataType(typeof(Role))]
+        public string Role { get; set; }
 
         [Required]
         [MinLength(6)]
