@@ -26,7 +26,7 @@ namespace Educati.Azure.Function.Api.Functions
         }
 
         [FunctionName("Profile")]
-        public async Task<HttpResponseMessage> Profile(
+        public async Task<IActionResult> Profile(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "user/profile")]
             [RequestBodyType(typeof(ProfileUpdateRequest), "User profile update request")] HttpRequest request)
         {
@@ -39,16 +39,11 @@ namespace Educati.Azure.Function.Api.Functions
             }
             catch (HttpResponseException ex)
             {
-                return new HttpResponseMessage(ex.Response.StatusCode)
-                {
-                    Content = new StringContent(string.Format(ex.Message)),
-                };
+
+                return new BadRequestObjectResult(ex);
 
             }
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(string.Format("Profile update sucessfully!")),
-            };
+            return new OkObjectResult(new { message = "Profile update successfully." });
         }
     }
 }
