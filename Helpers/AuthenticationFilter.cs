@@ -1,11 +1,11 @@
-﻿using Educati.Azure.Function.Api.Helpers.Enums;
-using Educati.Azure.Function.Api.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +20,6 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
     {
         private const string AUTH_HEADER_NAME = "Authorization";
         private const string BEARER_PREFIX = "Bearer ";
-        protected AccessTokenStatus accessTokenStatus;
 
         /// <summary>
         ///     Pre-execution filter.
@@ -28,10 +27,10 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
         /// <remarks>
         ///     This mechanism can be used to extract the authentication information. 
         /// </remarks>
-        public Task  OnExecutingAsync(FunctionExecutingContext executingContext, CancellationToken cancellationToken)
+        public Task OnExecutingAsync(FunctionExecutingContext executingContext, CancellationToken cancellationToken)
         {
             var httpRequest = executingContext.Arguments.First().Value as HttpRequest;
-            accessTokenStatus = ValidateToken(httpRequest).Status;
+            ValidateToken(httpRequest);
             return Task.CompletedTask;
 
         }
@@ -45,7 +44,17 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
             return Task.CompletedTask;
         }
 
-        private AccessTokenResult ValidateToken(HttpRequest request)
+        public HttpStatusCode AuthorizationStatus(HttpRequest request)
+        {
+            StringValues keys;
+            if (!request.Headers.TryGetValue("AuthorizationStatus", out keys))
+                return HttpStatusCode.ExpectationFailed;
+            Int16 httpStatus = Convert.ToInt16(keys.First());
+            return (HttpStatusCode)httpStatus;
+
+        }
+
+        private void ValidateToken(HttpRequest request)
         {
             try
             {
@@ -75,20 +84,28 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
                     // Validate the token
                     var handler = new JwtSecurityTokenHandler();
                     var result = handler.ValidateToken(token, tokenParams, out var securityToken);
-                    return AccessTokenResult.Success(result);
+                    if (result.HasClaim((result) => result.Issuer == issuer))
+                    {
+                        request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Accepted).ToString());
+                    }
+                    else
+                    {
+                        request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Unauthorized).ToString());
+
+                    }
                 }
                 else
                 {
-                    return AccessTokenResult.NoToken();
+                    request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Unauthorized).ToString());
                 }
             }
             catch (SecurityTokenExpiredException)
             {
-                return AccessTokenResult.Expired();
+                request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Gone).ToString());
             }
             catch (Exception ex)
             {
-                return AccessTokenResult.Error(ex);
+                request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.ExpectationFailed).ToString());
             }
         }
     }
