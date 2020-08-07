@@ -4,6 +4,7 @@ using Educati.Azure.Function.Api.Entites;
 using Educati.Azure.Function.Api.Helpers;
 using Educati.Azure.Function.Api.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,8 +32,11 @@ namespace Educati.Azure.Function.Api.Services
         public async Task<AuthenticateResponse> Authenticate(AuthenticateRequest model)
         {
             // validate
-            var users = await _tableStorage.GetAllAsync<User>("User");
-            var account = users.SingleOrDefault(x => x.Email == model.Email);
+            TableQuery<User> query = new TableQuery<User>()
+                   .Where(TableQuery.GenerateFilterCondition("Email", QueryComparisons.Equal, model.Email));
+            var users = await _tableStorage.QueryAsync<User>("User", query);
+
+            var account = users.SingleOrDefault();
 
             if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
             {
