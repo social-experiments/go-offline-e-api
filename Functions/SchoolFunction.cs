@@ -23,10 +23,10 @@ namespace Educati.Azure.Function.Api.Functions
             _schoolService = schoolService;
         }
 
-        [FunctionName("CreateSchool")]
+        [FunctionName("CreateUpdateSchool")]
         public async Task<IActionResult> Register(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "school/create")]
-            [RequestBodyType(typeof(SchoolRequest), "Create new school")] HttpRequest request)
+           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "school")]
+            [RequestBodyType(typeof(SchoolRequest), "Create/update school")] HttpRequest request)
         {
             var validateStatus = base.AuthorizationStatus(request);
             if (validateStatus != System.Net.HttpStatusCode.Accepted)
@@ -37,9 +37,9 @@ namespace Educati.Azure.Function.Api.Functions
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
             SchoolRequest requestData = JsonConvert.DeserializeObject<SchoolRequest>(requestBody);
 
-            await _schoolService.Create(requestData);
+            await _schoolService.CreateUpdate(requestData);
 
-            return new OkObjectResult(new { message = "Create school successful." });
+            return new OkObjectResult(new { message = "Create/update school successful." });
         }
 
         [FunctionName("SchoolList")]
