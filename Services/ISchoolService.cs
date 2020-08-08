@@ -6,7 +6,7 @@ namespace Educati.Azure.Function.Api.Services
 {
     public interface ISchoolService
     {
-        Task Create(SchoolRequest model);
+        Task CreateUpdate(SchoolRequest model);
 
         Task<IEnumerable<School>> GetAll();
     }
