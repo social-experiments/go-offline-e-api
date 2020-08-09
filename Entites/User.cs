@@ -22,5 +22,6 @@ namespace Educati.Azure.Function.Api.Entites
         public DateTime? Verified { get; set; }
         public bool IsVerified => Verified.HasValue || PasswordReset.HasValue;
         public DateTime? PasswordReset { get; set; }
+        public string ProfileStoragePath { get; set; }
     }
 }

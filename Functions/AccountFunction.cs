@@ -19,7 +19,7 @@ namespace Educati.Azure.Function.Api.Functions
             _accountService = accountService;
         }
 
-        [FunctionName("Login")]
+        [FunctionName("AccountLogin")]
         public async Task<IActionResult> Login(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "login")]
             [RequestBodyType(typeof(AuthenticateRequest), "User authentication request")] HttpRequest request)
@@ -32,7 +32,7 @@ namespace Educati.Azure.Function.Api.Functions
             return new OkObjectResult(response);
         }
 
-        [FunctionName("Signup")]
+        [FunctionName("AccountSignup")]
         public async Task<IActionResult> Register(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "signup")]
             [RequestBodyType(typeof(RegisterRequest), "New user account request")] HttpRequest request)

@@ -1,14 +1,14 @@
-using Educati.Azure.Function.Api.Entites;
+﻿using Educati.Azure.Function.Api.Entites;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace Educati.Azure.Function.Api.Models
 {
-    public class RegisterRequest
+    public abstract class  UserRequest
     {
-       
         public string Id { get; set; }
-
-        public string SchoolId { get; set; }
 
         [Required]
         public string FirstName { get; set; }
@@ -24,15 +24,11 @@ namespace Educati.Azure.Function.Api.Models
         [EnumDataType(typeof(Role))]
         public string Role { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
-
-        [Required]
-        [Compare("Password")]
-        public string ConfirmPassword { get; set; }
-
         [Range(typeof(bool), "true", "true")]
         public bool AcceptTerms { get; set; }
+
+        public DateTime? SyncDateTime { get; set; }
+
+        public string CreatedBy { get; set; }
     }
 }

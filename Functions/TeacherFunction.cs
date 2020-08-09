@@ -1,34 +1,61 @@
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using Educati.Azure.Function.Api.Helpers.Attributes;
+using Educati.Azure.Function.Api.Models;
+using Educati.Azure.Function.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NSwag.Annotations;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Educati.Azure.Function.Api.Functions
 {
-    public static class TeacherFunction
+    public class TeacherFunction : AuthenticationFilter
     {
-        [FunctionName("TeacherFunction")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private readonly ITeacherService _teacherService;
+        public TeacherFunction(ITeacherService teacherService)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _teacherService = teacherService;
+        }
+        [FunctionName("TeacherCreateUpdate")]
+        [OpenApiOperation("Create/Update", "Teacher")]
+        public async Task<IActionResult> Register(
+          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "teacher")]
+            [RequestBodyType(typeof(TeacherRequest), "Create/update teacher")] HttpRequest request)
+        {
+            var validateStatus = base.AuthorizationStatus(request);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
 
-            string name = req.Query["name"];
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            TeacherRequest requestData = JsonConvert.DeserializeObject<TeacherRequest>(requestBody);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            await _teacherService.CreateUpdate(requestData);
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            return new OkObjectResult(new { message = "Create/update school successful." });
+        }
 
-            return new OkObjectResult(responseMessage);
+        [FunctionName("TeacherList")]
+        [OpenApiOperation("List", "Teacher")]
+        public async Task<IActionResult> TeacherList(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teachers/{id}")] HttpRequest req)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            string schoolId = req.Query["id"];
+            if (validateStatus != System.Net.HttpStatusCode.Accepted && String.IsNullOrEmpty(schoolId))
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            var response = await _teacherService.GetAll(schoolId);
+
+            return new OkObjectResult(response);
         }
     }
 }

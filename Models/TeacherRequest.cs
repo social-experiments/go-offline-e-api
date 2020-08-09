@@ -1,29 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace Educati.Azure.Function.Api.Models
 {
-    public class Student: BaseEntity
+    public class TeacherRequest: UserRequest
     {
-        public Student() { }
+        [Required]
+        public string SchoolId { get; set; }
 
-        public Student(string schoolId, string userId)
-        {
-            this.PartitionKey = schoolId;
-            this.RowKey = userId;
-        }
-
-        public string Gender { get; set; }
-        public DateTime? DOB { get; set; }
+        [Required]
         public string Address1 { get; set; }
+
         public string Address2 { get; set; }
+
+        [Required]
         public string Country { get; set; }
+
+        [Required]
         public string State { get; set; }
+
+        [Required]
         public string City { get; set; }
+
+        [Required]
         public string Zip { get; set; }
         public string Latitude { get; set; }
         public string Longitude { get; set; }
-        public DateTime? SyncDateTime { get; set; }
     }
 }
