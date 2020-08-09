@@ -18,6 +18,13 @@ namespace Educati.Azure.Function.Api.Helpers
             CreateMap<CreateRequest, User>();
             CreateMap<Entites.School, Models.School>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.RowKey));
             CreateMap<Models.School, Entites.School>().ForMember(dest => dest.RowKey, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<TeacherRequest, User>();
+            CreateMap<TeacherRequest, Teacher>();
+
+            CreateMap<User, TeacherResponse>();
+            CreateMap<Teacher, TeacherResponse>();
+
             CreateMap<UpdateRequest, User>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
@@ -32,6 +39,8 @@ namespace Educati.Azure.Function.Api.Helpers
                         return true;
                     }
                 ));
+
         }
     }
+
 }

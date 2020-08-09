@@ -23,7 +23,7 @@ namespace Educati.Azure.Function.Api.Functions
             _schoolService = schoolService;
         }
 
-        [FunctionName("CreateUpdateSchool")]
+        [FunctionName("SchoolCreateUpdate")]
         public async Task<IActionResult> Register(
            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "school")]
             [RequestBodyType(typeof(SchoolRequest), "Create/update school")] HttpRequest request)

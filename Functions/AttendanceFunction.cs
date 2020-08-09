@@ -1,10 +1,16 @@
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using Educati.Azure.Function.Api.Helpers.Attributes;
+using Educati.Azure.Function.Api.Models;
+using Educati.Azure.Function.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -12,24 +18,22 @@ namespace Educati.Azure.Function.Api.Functions
 {
     public  class AttendanceFunction: AuthenticationFilter
     {
-        [FunctionName("AttendanceFunction")]
+        private readonly IEmailService _emailService;
+        public AttendanceFunction (IEmailService emailService)
+        {
+            _emailService = emailService;
+        }
+        [FunctionName("EmailTestFunction")]
         public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "emai/Test")]
+            [RequestBodyType(typeof(EmailRequest), "Email Test API")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            EmailRequest emailRequest = JsonConvert.DeserializeObject<EmailRequest>(requestBody);
+            await _emailService.SendAsync(emailRequest);
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult("Email triggered function executed successfully.");
         }
     }
 }

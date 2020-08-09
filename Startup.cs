@@ -39,6 +39,9 @@ namespace Educati
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<ISchoolService, SchoolService>();
             services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<ITeacherService, TeacherService>();
+            services.AddTransient<IEmailService, EmailService>();
+
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(FunctionConfigs.TableStorageConnstionString));
         }
     }

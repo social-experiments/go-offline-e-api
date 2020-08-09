@@ -63,7 +63,7 @@ namespace Educati.Azure.Function.Api.Services
             return response;
         }
 
-        public async Task Register(RegisterRequest model)
+        public async Task<object> Register(RegisterRequest model)
         {
             // validate
             var users = await _tableStorage.GetAllAsync<User>("User");
@@ -77,13 +77,17 @@ namespace Educati.Azure.Function.Api.Services
                 };
                 throw new HttpResponseException(resp);
             }
-            var userId = Guid.NewGuid().ToString();
-            var newUser = new User(userId, userId)
+
+            var defaultPasswrod = model.Password ?? "p@ssw0rd";
+            var userId = model.Id?? Guid.NewGuid().ToString();
+            var schoolId = model.SchoolId ?? userId;
+
+            var newUser = new User(schoolId, userId)
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
-                PasswordHash = BC.HashPassword(model.Password),
+                PasswordHash = BC.HashPassword(defaultPasswrod),
                 Role = model.Role,
                 Active = true,
                 Verified = DateTime.UtcNow,
@@ -95,7 +99,7 @@ namespace Educati.Azure.Function.Api.Services
 
             try
             {
-                await _tableStorage.AddAsync("User", newUser);
+                return await _tableStorage.AddAsync("User", newUser);
             }
             catch (Exception ex)
             {
