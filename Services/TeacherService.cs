@@ -125,6 +125,7 @@ namespace Educati.Azure.Function.Api.Services
             var teachersList= from user in users
                         join teacher in teachers
                              on user.RowKey equals teacher.RowKey
+                             orderby teacher.UpdatedOn descending
                         select new TeacherResponse
                         {
                             Id = user.RowKey,
