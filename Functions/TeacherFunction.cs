@@ -43,6 +43,7 @@ namespace Educati.Azure.Function.Api.Functions
 
         [FunctionName("TeacherList")]
         [OpenApiOperation("List", "Teacher")]
+        [QueryStringParameter("id", "School id", DataType = typeof(string), Required = true)]
         public async Task<IActionResult> TeacherList(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teachers/{id}")] HttpRequest req)
         {
