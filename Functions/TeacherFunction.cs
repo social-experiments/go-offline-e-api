@@ -45,11 +45,12 @@ namespace Educati.Azure.Function.Api.Functions
         [OpenApiOperation("List", "Teacher")]
         [QueryStringParameter("id", "School id", DataType = typeof(string), Required = true)]
         public async Task<IActionResult> TeacherList(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teachers/{id}")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teachers/{id}")] HttpRequest req, string id)
         {
             var validateStatus = base.AuthorizationStatus(req);
             string schoolId = req.Query["id"];
-            if (validateStatus != System.Net.HttpStatusCode.Accepted && String.IsNullOrEmpty(schoolId))
+            schoolId = schoolId ?? id;
+            if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId))
             {
                 return new BadRequestObjectResult(validateStatus);
             }
