@@ -58,9 +58,9 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
         {
             try
             {
-                var audience = FunctionConfigs.Audience;
-                var issuer = FunctionConfigs.Issuer;
-                var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(FunctionConfigs.IssuerToken));
+                var audience = SettingConfigurations.Audience;
+                var issuer = SettingConfigurations.Issuer;
+                var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SettingConfigurations.IssuerToken));
                 // Get the token from the header
                 if (request != null &&
                     request.Headers.ContainsKey(AUTH_HEADER_NAME) &&

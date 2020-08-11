@@ -150,7 +150,7 @@ namespace Educati.Azure.Function.Api.Services
         // helper methods
         public string GenerateToken(string userId)
         {
-            var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(FunctionConfigs.IssuerToken));
+            var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SettingConfigurations.IssuerToken));
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -160,8 +160,8 @@ namespace Educati.Azure.Function.Api.Services
                     new Claim(ClaimTypes.NameIdentifier, userId),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = FunctionConfigs.Issuer,
-                Audience = FunctionConfigs.Audience,
+                Issuer = SettingConfigurations.Issuer,
+                Audience = SettingConfigurations.Audience,
                 SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
             };
 

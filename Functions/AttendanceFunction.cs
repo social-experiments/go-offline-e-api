@@ -25,7 +25,7 @@ namespace Educati.Azure.Function.Api.Functions
         }
         [FunctionName("EmailTestFunction")]
         public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "emai/Test")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "email/Test")]
             [RequestBodyType(typeof(EmailRequest), "Email Test API")] HttpRequest req,
             ILogger log)
         {
