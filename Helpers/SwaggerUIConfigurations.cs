@@ -24,7 +24,8 @@ namespace Educati.Azure.Function.Api.Helpers
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer \"" + FunctionConfigs.IssuerToken,
+                Description = "JWT Authorization header using the Bearer scheme. " +
+                              "\r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer \"" + SettingConfigurations.IssuerToken,
             });
             swaggerGenOption.AddSecurityRequirement(
                 new OpenApiSecurityRequirement

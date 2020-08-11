@@ -42,7 +42,7 @@ namespace Educati
             services.AddTransient<ITeacherService, TeacherService>();
             services.AddTransient<IEmailService, EmailService>();
 
-            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(FunctionConfigs.TableStorageConnstionString));
+            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.TableStorageConnstionString));
         }
     }
 

@@ -1,13 +1,9 @@
-﻿using Educati.Azure.Function.Api.Models;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+﻿using Educati.Azure.Function.Api.Helpers;
+using Educati.Azure.Function.Api.Models;
+using MailKit.Net.Smtp;
+using MimeKit;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Educati.Azure.Function.Api.Services
 {
@@ -15,25 +11,53 @@ namespace Educati.Azure.Function.Api.Services
     {
         public async Task SendAsync(EmailRequest emailRequest)
         {
-            await configSendGridasync(emailRequest);
+            Message message = new Message(emailRequest);
+            var emailMessage = CreateEmailMessage(message);
+
+            await SendAsync(emailMessage);
         }
 
-        private async Task configSendGridasync(EmailRequest message)
+        private async Task SendAsync(MimeMessage mailMessage)
         {
-            var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-            var fromEmail = Environment.GetEnvironmentVariable("FROM_EMAIL");
-            var fromEmailName = Environment.GetEnvironmentVariable("FROM_EMAIL_NAME");
+            using (var client = new SmtpClient())
+            {
+                try
+                {
+                    await client.ConnectAsync(SettingConfigurations.SMTPServer, SettingConfigurations.SMTPPort, true);
+                    client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    await client.AuthenticateAsync(SettingConfigurations.SMTPUser, SettingConfigurations.SMTPPassword);
 
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress(fromEmail, fromEmailName);
-            var to = new EmailAddress(message.To, message.Name);
+                    await client.SendAsync(mailMessage);
+                }
+                catch (Exception ex)
+                {
+                    //log an error message or throw an exception, or both.
+                    throw;
+                }
+                finally
+                {
+                    await client.DisconnectAsync(true);
+                    client.Dispose();
+                }
+            }
+        }
 
-            var msg = MailHelper.CreateSingleEmail(from, to, message.Subject, message.PlainTextContent, message.HtmlContent);
+        private MimeMessage CreateEmailMessage(Message message)
+        {
+            var emailMessage = new MimeMessage();
+            if (!string.IsNullOrEmpty(message.FromEmail))
+            {
+                emailMessage.From.Add(new MailboxAddress(message.FromEmail));
+            }
+            else
+            {
+                emailMessage.From.Add(new MailboxAddress(SettingConfigurations.SMTPUser));
+            }
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Content };
 
-            var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
-
-            var result = response.Body;
-
+            return emailMessage;
         }
     }
 }
