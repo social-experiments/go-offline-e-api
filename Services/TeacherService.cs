@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace Educati.Azure.Function.Api.Services
 {
@@ -16,13 +17,15 @@ namespace Educati.Azure.Function.Api.Services
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
         private readonly IProfileService _profileService;
+        private readonly IEmailService _emailService;
 
-        public TeacherService(ITableStorage tableStorage, IMapper mapper, IAccountService accountService, IProfileService profileService)
+        public TeacherService(IEmailService emailService,ITableStorage tableStorage, IMapper mapper, IAccountService accountService, IProfileService profileService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
             _accountService = accountService;
             _profileService = profileService;
+            _emailService = emailService;
         }
         public async Task CreateUpdate(TeacherRequest model)
         {
@@ -71,6 +74,7 @@ namespace Educati.Azure.Function.Api.Services
             {
                 // Register user as teacher
                 var userId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+                var defaultPasswrod = SettingConfigurations.GetRandomPassword(10);
                 RegisterRequest registerRequest = new RegisterRequest
                 {
                     Email = model.Email,
@@ -79,13 +83,12 @@ namespace Educati.Azure.Function.Api.Services
                     Role = model.Role,
                     AcceptTerms = true,
                     Id = userId,
-                    SchoolId = model.SchoolId
+                    SchoolId = model.SchoolId,
+                    Password = defaultPasswrod,
+                    ConfirmPassword = defaultPasswrod
                 };
-                await _accountService.Register(registerRequest);
 
-                // Create new teacher 
-                
-                var newSchool = new Entites.Teacher(model.SchoolId, userId)
+                var newTeacher = new Entites.Teacher(model.SchoolId, userId)
                 {
                     Address1 = model.Address1,
                     Address2 = model.Address2,
@@ -100,13 +103,15 @@ namespace Educati.Azure.Function.Api.Services
                     UpdatedOn = DateTime.UtcNow,
                     UpdatedBy = model.CreatedBy,
                 };
-
                 try
                 {
-                    await _tableStorage.AddAsync("Teacher", newSchool);
+                    await _accountService.Register(registerRequest);
+                    await _tableStorage.AddAsync("Teacher", newTeacher);
+                    await NewTeacherNotificationEmail(registerRequest);
                 }
                 catch (Exception ex)
                 {
+
                     throw new AppException("Create teacher error: ", ex.InnerException);
                 }
             }
@@ -142,6 +147,26 @@ namespace Educati.Azure.Function.Api.Services
                         };
 
             return teachersList;
+        }
+
+        private async Task NewTeacherNotificationEmail(RegisterRequest registerRequest)
+        {
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.AppendFormat("<p>Hi, <br/>", Environment.NewLine);
+            emailBody.AppendFormat("Congratulations! <br/>", Environment.NewLine);
+            emailBody.AppendFormat("You have registerd with portal! Below are the login credentials <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"User Name: <b>{registerRequest.Email} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Password: {registerRequest.Password} </b></p>", Environment.NewLine);
+            EmailRequest emailRequest = new EmailRequest
+            {
+                To = new List<string>
+            {
+                registerRequest.Email
+            },
+                Subject = "Your registration was successful!",
+                HtmlContent = emailBody.ToString()
+            };
+            await _emailService.SendAsync(emailRequest);
         }
     }
 }

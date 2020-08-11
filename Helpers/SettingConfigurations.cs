@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 
 namespace Educati.Azure.Function.Api.Helpers
 {
@@ -18,6 +19,12 @@ namespace Educati.Azure.Function.Api.Helpers
         //Table storage connection string
         public static string TableStorageConnstionString => Environment.GetEnvironmentVariable("AzureWebJobsStorage");
 
-
+        public static string GetRandomPassword(int length)
+        {
+            byte[] rgb = new byte[length];
+            RNGCryptoServiceProvider rngCrypt = new RNGCryptoServiceProvider();
+            rngCrypt.GetBytes(rgb);
+            return Convert.ToBase64String(rgb);
+        }
     }
 }

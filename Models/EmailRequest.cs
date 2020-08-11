@@ -7,7 +7,7 @@ namespace Educati.Azure.Function.Api.Models
     public class EmailRequest
     {
         public string Subject { get; set; }
-        public IEnumerable<string> To { get; set; }
+        public List<string> To { get; set; }
         public string FromEmail { get; set; }
         public string FromName { get; set; }
         public string HtmlContent { get; set; }
