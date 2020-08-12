@@ -5,7 +5,7 @@ namespace Educati.Azure.Function.Api.Models
     public class ResetPasswordRequest
     {
         [Required]
-        public string Token { get; set; }
+        public string UserId { get; set; }
 
         [Required]
         [MinLength(6)]
