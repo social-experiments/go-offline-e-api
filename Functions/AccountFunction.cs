@@ -1,4 +1,5 @@
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using Educati.Azure.Function.Api.Helpers.Attributes;
 using Educati.Azure.Function.Api.Models;
 using Educati.Azure.Function.Api.Services;
 using Microsoft.AspNetCore.Http;
@@ -7,11 +8,12 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Educati.Azure.Function.Api.Functions
 {
-    public class AccountFunction
+    public class AccountFunction : AuthenticationFilter
     {
         private readonly IAccountService _accountService;
         public AccountFunction(IAccountService accountService)
@@ -43,6 +45,24 @@ namespace Educati.Azure.Function.Api.Functions
             await _accountService.Register(requestData);
 
             return new OkObjectResult(new { message = "Registration successful." });
+        }
+
+        [FunctionName("AccountResetPassword")]
+        public async Task<IActionResult> ResetPassword(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "reset/password")]
+            [RequestBodyType(typeof(ResetPasswordRequest), "Reset password request")] HttpRequest request)
+        {
+            var validateStatus = base.AuthorizationStatus(request);
+            if (validateStatus != HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            ResetPasswordRequest requestData = JsonConvert.DeserializeObject<ResetPasswordRequest>(requestBody);
+
+            await _accountService.ResetPassword(requestData);
+
+            return new OkObjectResult(new { message = "Reset password successfully." });
         }
     }
 }

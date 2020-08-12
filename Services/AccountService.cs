@@ -57,6 +57,7 @@ namespace Educati.Azure.Function.Api.Services
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Role = account.Role,
+                ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
 
@@ -79,7 +80,7 @@ namespace Educati.Azure.Function.Api.Services
             }
 
             var defaultPasswrod = model.Password ?? "p@ssw0rd";
-            var userId = model.Id?? Guid.NewGuid().ToString();
+            var userId = model.Id ?? Guid.NewGuid().ToString();
             var schoolId = model.SchoolId ?? userId;
 
             var newUser = new User(schoolId, userId)
@@ -95,6 +96,7 @@ namespace Educati.Azure.Function.Api.Services
                 CreatedBy = userId,
                 UpdatedOn = DateTime.UtcNow,
                 UpdatedBy = userId,
+                ForceChangePasswordNextLogin = true
             };
 
             try
@@ -117,9 +119,52 @@ namespace Educati.Azure.Function.Api.Services
             throw new NotImplementedException();
         }
 
-        public Task ResetPassword(ResetPasswordRequest model)
+        public async Task ResetPassword(ResetPasswordRequest model)
         {
-            throw new NotImplementedException();
+            // validate
+            TableQuery<User> query = new TableQuery<User>()
+                   .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, model.UserId));
+            var users = await _tableStorage.QueryAsync<User>("User", query);
+            var currentUser = users.SingleOrDefault();
+
+            // Validate password and confirmed passwrd are same.
+            if (!String.IsNullOrEmpty(model.Password) && !String.IsNullOrEmpty(model.Password))
+            {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    var resp = new HttpResponseMessage(HttpStatusCode.NotAcceptable)
+                    {
+                        Content = new StringContent(string.Format("Password and confirm password are not same!")),
+
+                    };
+                    throw new HttpResponseException(resp);
+                }
+                currentUser.PasswordHash = BC.HashPassword(model.Password);
+            }
+            else
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.NotAcceptable)
+                {
+                    Content = new StringContent(string.Format("Password and confirm password are required to change!")),
+
+                };
+                throw new HttpResponseException(resp);
+            }
+
+            currentUser.ForceChangePasswordNextLogin = false;
+            currentUser.PasswordReset = DateTime.UtcNow;
+            currentUser.Verified = DateTime.UtcNow;
+            currentUser.UpdatedBy = model.UserId;
+
+            try
+            {
+                await _tableStorage.UpdateAsync("User", currentUser);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("User password reset error ", ex.InnerException);
+            }
+
         }
 
         Task<IEnumerable<AccountResponse>> IAccountService.GetAll()

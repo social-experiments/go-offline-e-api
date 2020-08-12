@@ -103,7 +103,7 @@ namespace Educati.Azure.Function.Api.Helpers.Attributes
             {
                 request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Gone).ToString());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.ExpectationFailed).ToString());
             }
