@@ -1,8 +1,15 @@
+using System.Collections.Generic;
+
 namespace Educati.Azure.Function.Api.Models
 {
     public class AuthenticateResponse
     {
+        public AuthenticateResponse()
+        {
+            this.Schools = new List<School>();
+        }
         public string Id { get; set; }
+        public IEnumerable<School> Schools { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

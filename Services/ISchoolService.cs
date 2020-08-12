@@ -8,6 +8,6 @@ namespace Educati.Azure.Function.Api.Services
     {
         Task CreateUpdate(SchoolRequest model);
 
-        Task<IEnumerable<School>> GetAll();
+        Task<IEnumerable<School>> GetAll(string schoolId = "");
     }
 }

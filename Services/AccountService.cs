@@ -22,10 +22,12 @@ namespace Educati.Azure.Function.Api.Services
     public class AccountService : IAccountService
     {
         private readonly ITableStorage _tableStorage;
+        private readonly ISchoolService _schoolService;
         private readonly IMapper _mapper;
-        public AccountService(ITableStorage tableStorage, IMapper mapper)
+        public AccountService(ITableStorage tableStorage, ISchoolService schoolService,IMapper mapper)
         {
             _tableStorage = tableStorage;
+            _schoolService = schoolService;
             _mapper = mapper;
         }
 
@@ -50,6 +52,8 @@ namespace Educati.Azure.Function.Api.Services
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey);
 
+            var schools = account.Role == Role.Teacher.ToString()? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
+
             var response = new AuthenticateResponse
             {
                 Id = account.RowKey,
@@ -57,6 +61,7 @@ namespace Educati.Azure.Function.Api.Services
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Role = account.Role,
+                Schools = schools,
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
