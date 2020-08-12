@@ -85,11 +85,12 @@ namespace Educati.Azure.Function.Api.Services
 
         }
 
-        public async Task<IEnumerable<Models.School>> GetAll()
+        public async Task<IEnumerable<Models.School>> GetAll(string schoolId = "")
         {
-            var schools = await _tableStorage.GetAllAsync<Entites.School>("School");
-
+            var allSchools = await _tableStorage.GetAllAsync<Entites.School>("School");
+            var schools = string.IsNullOrEmpty(schoolId) ? allSchools : allSchools.Where(school => school.RowKey == schoolId);
             return this._mapper.Map<IEnumerable<Models.School>>(schools);
         }
+
     }
 }
