@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public class Attentdance: BaseEntity
     {

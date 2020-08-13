@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace Educati.Azure.Function.Api.Helpers
+namespace goOfflineE.Helpers
 {
     public static class SettingConfigurations
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     public class EmailConfiguration
     {

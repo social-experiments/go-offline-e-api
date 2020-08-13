@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public class Teacher: BaseEntity
     {

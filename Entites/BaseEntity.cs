@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public abstract class BaseEntity: TableEntity
     {

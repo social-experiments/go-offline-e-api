@@ -1,10 +1,10 @@
-﻿using Educati.Azure.Function.Api.Entites;
+﻿using goOfflineE.Entites;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     public abstract class  UserRequest
     {

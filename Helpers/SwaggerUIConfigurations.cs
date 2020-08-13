@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Educati.Azure.Function.Api.Helpers
+namespace goOfflineE.Helpers
 {
     public class SwaggerUIConfigurations
     {
@@ -13,8 +13,8 @@ namespace Educati.Azure.Function.Api.Helpers
             swaggerGenOption.SwaggerDoc("v2", new OpenApiInfo
             {
                 Version = "v2",
-                Title = "Educati",
-                Description = "Educati Azure Function API"
+                Title = "goOfflineE",
+                Description = "goOfflineE Azure Function API"
             });
             // To Enable authorization using Swagger (JWT) 
             swaggerGenOption.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()

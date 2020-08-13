@@ -1,0 +1,26 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=goofflinee;AccountKey=+4scUzk7yiPO1ltE+cPwnf/lwOyg2V8RAyJMDEb0jjxRcQFxQDjWS/BV9Q8YZyMp5XtOo0uyMhD0ipJJ1f76LQ==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "ISSUER_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwibmJmIjoxNTk0OTg3MTY3LCJleHAiOjE1OTU1OTE5NjcsImlhdCI6MTU5NDk4NzE2NywiaXNzIjoiSXNzdWVyIiwiYXVkIjoiQXVkaWVuY2UifQ.fEPJyK354PXszYdNncqBXl7RCgUN7v5fRs2G4zyaH2Q",
+    "AUDIENCE": "goOfflineE",
+    "ISSUER": "SocialExperiments",
+
+    "SMTP_USER": "zcondigitalschool@gmail.com",
+    "SMTP_PASSWORD": "zcpl@123",
+    "SMTP_SERVER": "smtp.gmail.com",
+    "SMTP_PORT": "465",
+
+    "OpenApi__Info__Version": "2.0.0",
+    "OpenApi__Info__Title": "goOfflineE Azure Function API",
+    "OpenApi__Info__Description": "A sample API that runs on Azure Functions either 1.x or 2.x using Open API specification.",
+    "OpenApi__Info__Contact__Name": "Social Experiments Community",
+    "OpenApi__Info__Contact__Email": "no-reply@goofflinee.org",
+    "OpenApi__Info__License__Name": "MIT"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*"
+  }
+}

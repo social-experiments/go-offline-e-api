@@ -1,14 +1,14 @@
 ﻿using Aducati.Azure.TableStorage.Repository;
 using AutoMapper;
-using Educati.Azure.Function.Api.Helpers;
-using Educati.Azure.Function.Api.Models;
+using goOfflineE.Helpers;
+using goOfflineE.Models;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public class SchoolService : ISchoolService
     {

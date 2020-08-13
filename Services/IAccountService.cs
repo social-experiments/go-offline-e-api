@@ -1,9 +1,9 @@
-﻿using Educati.Azure.Function.Api.Entites;
-using Educati.Azure.Function.Api.Models;
+﻿using goOfflineE.Entites;
+using goOfflineE.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public interface IAccountService
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     public class AccountResponse
     {

@@ -1,4 +1,4 @@
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public enum Role
     {
