@@ -1,8 +1,8 @@
-﻿using Educati.Azure.Function.Api.Models;
+﻿using goOfflineE.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public interface ISchoolService
     {

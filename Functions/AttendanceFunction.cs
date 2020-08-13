@@ -1,7 +1,7 @@
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using Educati.Azure.Function.Api.Helpers.Attributes;
-using Educati.Azure.Function.Api.Models;
-using Educati.Azure.Function.Api.Services;
+using goOfflineE.Helpers.Attributes;
+using goOfflineE.Models;
+using goOfflineE.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Functions
+namespace goOfflineE.Functions
 {
     public  class AttendanceFunction: AuthenticationFilter
     {

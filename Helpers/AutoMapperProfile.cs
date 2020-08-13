@@ -1,8 +1,8 @@
 using AutoMapper;
-using Educati.Azure.Function.Api.Entites;
-using Educati.Azure.Function.Api.Models;
+using goOfflineE.Entites;
+using goOfflineE.Models;
 
-namespace Educati.Azure.Function.Api.Helpers
+namespace goOfflineE.Helpers
 {
     public class AutoMapperProfile : Profile
     {

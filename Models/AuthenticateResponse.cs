@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     public class AuthenticateResponse
     {

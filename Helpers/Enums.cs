@@ -1,4 +1,4 @@
-﻿namespace Educati.Azure.Function.Api.Helpers.Enums
+﻿namespace goOfflineE.Helpers.Enums
 {
     public enum AccessTokenStatus
     {

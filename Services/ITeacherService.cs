@@ -1,10 +1,10 @@
-﻿using Educati.Azure.Function.Api.Models;
+﻿using goOfflineE.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public interface ITeacherService
     {

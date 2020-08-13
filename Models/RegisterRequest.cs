@@ -1,7 +1,7 @@
-using Educati.Azure.Function.Api.Entites;
+using goOfflineE.Entites;
 using System.ComponentModel.DataAnnotations;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     public class RegisterRequest
     {

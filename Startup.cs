@@ -2,16 +2,16 @@
 using Aducati.Azure.TableStorage.Repository;
 using AutoMapper;
 using AzureFunctions.Extensions.Swashbuckle;
-using Educati;
-using Educati.Azure.Function.Api.Helpers;
-using Educati.Azure.Function.Api.Services;
+using goOfflineE;
+using goOfflineE.Helpers;
+using goOfflineE.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 
 [assembly: FunctionsStartup(typeof(Startup))]
-namespace Educati
+namespace goOfflineE
 {
     // <summary>
     // Runs when the Azure Functions host starts.

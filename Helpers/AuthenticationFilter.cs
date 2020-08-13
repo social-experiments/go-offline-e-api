@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Helpers.Attributes
+namespace goOfflineE.Helpers.Attributes
 {
 
     /// <summary>

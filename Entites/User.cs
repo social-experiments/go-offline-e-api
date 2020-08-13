@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public class User: BaseEntity
     {

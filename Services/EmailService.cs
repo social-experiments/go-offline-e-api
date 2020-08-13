@@ -1,11 +1,11 @@
-﻿using Educati.Azure.Function.Api.Helpers;
-using Educati.Azure.Function.Api.Models;
+﻿using goOfflineE.Helpers;
+using goOfflineE.Models;
 using MailKit.Net.Smtp;
 using MimeKit;
 using System;
 using System.Threading.Tasks;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public class EmailService : IEmailService
     {

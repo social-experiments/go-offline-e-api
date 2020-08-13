@@ -1,7 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
 
-namespace Educati.Azure.Function.Api.Entites
+namespace goOfflineE.Entites
 {
     public class School: BaseEntity
     {

@@ -1,8 +1,8 @@
 ﻿using Aducati.Azure.TableStorage.Repository;
 using AutoMapper;
-using Educati.Azure.Function.Api.Entites;
-using Educati.Azure.Function.Api.Helpers;
-using Educati.Azure.Function.Api.Models;
+using goOfflineE.Entites;
+using goOfflineE.Helpers;
+using goOfflineE.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using BC = BCrypt.Net.BCrypt;
 
-namespace Educati.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public class AccountService : IAccountService
     {

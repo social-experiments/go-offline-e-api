@@ -1,8 +1,8 @@
-﻿using Educati.Azure.Function.Api.Helpers.Enums;
+﻿using goOfflineE.Helpers.Enums;
 using System;
 using System.Security.Claims;
 
-namespace Educati.Azure.Function.Api.Models
+namespace goOfflineE.Models
 {
     /// <summary>
     /// Contains the result of an access token check.
