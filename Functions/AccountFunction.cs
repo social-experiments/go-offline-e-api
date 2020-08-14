@@ -16,6 +16,7 @@ namespace goOfflineE.Functions
     public class AccountFunction : AuthenticationFilter
     {
         private readonly IAccountService _accountService;
+
         public AccountFunction(IAccountService accountService)
         {
             _accountService = accountService;

@@ -17,5 +17,7 @@ namespace goOfflineE.Entites
 
         public string ClassRoomName { get; set; }
 
+        public string ClassDivision { get; set; }
+
     }
 }
