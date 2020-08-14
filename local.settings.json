@@ -12,6 +12,20 @@
     "SMTP_SERVER": "smtp.gmail.com",
     "SMTP_PORT": "465",
 
+    "ApplicationId": "49be2977-8d26-4b63-9d67-e4e78cc30705",
+    "ApplicationSecret": "1+ruJugflpXdxRK0eQUMFQ4CxCpQCXa+ELzERww3inY=",
+    "AuthorityUrl": "https://login.windows.net/common/oauth2/token/",
+    "ResourceUrl": "https://analysis.windows.net/powerbi/api",
+    "ApiUrl": "https://api.powerbi.com/",
+    "EmbedUrlBase": "https://app.powerbi.com/",
+    "PUserName": "payals@socialexps.onmicrosoft.com",
+    "Password": "Mahesh82",
+
+    "PWorkspaceId": "b176ba8b-1ef6-4e87-9600-e9b5e05f8900",
+    "ReportId": "6089e725-db52-4e90-8893-25722fd4f8f4",
+    "DashboardId": "40e41058-024d-4b6b-9483-9c02342f5dc2",
+    "TokenType": "Embed",
+
     "OpenApi__Info__Version": "2.0.0",
     "OpenApi__Info__Title": "goOfflineE Azure Function API",
     "OpenApi__Info__Description": "A sample API that runs on Azure Functions either 1.x or 2.x using Open API specification.",
