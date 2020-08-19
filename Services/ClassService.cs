@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace goOfflineE.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public class ClassService : IClassService
     {

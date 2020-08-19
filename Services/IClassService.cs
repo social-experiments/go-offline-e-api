@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace goOfflineE.Azure.Function.Api.Services
+namespace goOfflineE.Services
 {
     public interface IClassService
     {

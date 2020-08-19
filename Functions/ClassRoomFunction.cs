@@ -1,5 +1,5 @@
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using goOfflineE.Azure.Function.Api.Services;
+using goOfflineE.Services;
 using goOfflineE.Helpers.Attributes;
 using goOfflineE.Models;
 using Microsoft.AspNetCore.Http;

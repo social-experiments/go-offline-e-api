@@ -1,30 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace goOfflineE.Entites
+namespace goOfflineE.Models
 {
-    public class Student: BaseEntity
+    public class StudentResponse
     {
-        public Student() { }
+        public string Id { get; set; }
 
-        public Student(string schoolId, string userId)
-        {
-            this.PartitionKey = schoolId;
-            this.RowKey = userId;
-        }
+        public string SchoolId { get; set; }
 
-        public string Gender { get; set; }
         public string ClassId { get; set; }
-        public DateTime? DOB { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        [EmailAddress]
+        public string Email { get; set; }
+
         public string Address1 { get; set; }
+
         public string Address2 { get; set; }
+
         public string Country { get; set; }
+
         public string State { get; set; }
+
         public string City { get; set; }
+
         public string Zip { get; set; }
+
         public string Latitude { get; set; }
+
         public string Longitude { get; set; }
-        public DateTime? SyncDateTime { get; set; }
     }
 }
