@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace goOfflineE.Functions
 {
-    public  class PowerBIFunction : AuthenticationFilter
+    public class PowerBIFunction : AuthenticationFilter
     {
         private readonly IPowerBIService _powerBIService;
         public PowerBIFunction(IPowerBIService powerService)

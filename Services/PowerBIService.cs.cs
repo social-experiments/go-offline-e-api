@@ -1,5 +1,5 @@
-﻿using goOfflineE.Azure.Function.Api.Models;
-using goOfflineE.Helpers;
+﻿using goOfflineE.Helpers;
+using goOfflineE.Models;
 using Microsoft.PowerBI.Api;
 using Microsoft.PowerBI.Api.Models;
 using Microsoft.Rest;

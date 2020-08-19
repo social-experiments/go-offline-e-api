@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 
 namespace goOfflineE.Entites
 {
-    public class User: BaseEntity
+    public class User : BaseEntity
     {
         public User(string schoolId, string userId)
         {

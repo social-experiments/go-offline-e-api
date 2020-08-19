@@ -1,11 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace goOfflineE.Entites
+﻿namespace goOfflineE.Entites
 {
-    public class ClassRoom: BaseEntity
+    public class ClassRoom : BaseEntity
     {
         public ClassRoom() { }
 

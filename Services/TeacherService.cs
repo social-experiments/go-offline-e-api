@@ -6,8 +6,8 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace goOfflineE.Services
 {
@@ -19,7 +19,7 @@ namespace goOfflineE.Services
         private readonly IProfileService _profileService;
         private readonly IEmailService _emailService;
 
-        public TeacherService(IEmailService emailService,ITableStorage tableStorage, IMapper mapper, IAccountService accountService, IProfileService profileService)
+        public TeacherService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IAccountService accountService, IProfileService profileService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
@@ -29,7 +29,7 @@ namespace goOfflineE.Services
         }
         public async Task CreateUpdate(TeacherRequest model)
         {
-           
+
             TableQuery<Entites.Teacher> query = new TableQuery<Entites.Teacher>()
                   .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, model.Id));
             var teacherQuery = await _tableStorage.QueryAsync<Entites.Teacher>("Teacher", query);
@@ -128,24 +128,24 @@ namespace goOfflineE.Services
             TableQuery<Entites.Teacher> teacherQuery = new TableQuery<Entites.Teacher>()
                   .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
             var teachers = await _tableStorage.QueryAsync<Entites.Teacher>("Teacher", teacherQuery);
-            var teachersList= from user in users
-                        join teacher in teachers
-                             on user.RowKey equals teacher.RowKey
-                             orderby teacher.UpdatedOn descending
-                        select new TeacherResponse
-                        {
-                            Id = user.RowKey,
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Email = user.Email,
-                            Address1 = teacher.Address1,
-                            Address2 = teacher.Address2,
-                            Country = teacher.Country,
-                            State = teacher.State,
-                            City = teacher.City,
-                            Zip = teacher.Zip,
-                            SchoolId = teacher.PartitionKey
-                        };
+            var teachersList = from user in users
+                               join teacher in teachers
+                                    on user.RowKey equals teacher.RowKey
+                               orderby teacher.UpdatedOn descending
+                               select new TeacherResponse
+                               {
+                                   Id = user.RowKey,
+                                   FirstName = user.FirstName,
+                                   LastName = user.LastName,
+                                   Email = user.Email,
+                                   Address1 = teacher.Address1,
+                                   Address2 = teacher.Address2,
+                                   Country = teacher.Country,
+                                   State = teacher.State,
+                                   City = teacher.City,
+                                   Zip = teacher.Zip,
+                                   SchoolId = teacher.PartitionKey
+                               };
 
             return teachersList;
         }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace goOfflineE.Models
 {
-    public class TeacherRequest: UserRequest
+    public class TeacherRequest : UserRequest
     {
         [Required]
         public string SchoolId { get; set; }

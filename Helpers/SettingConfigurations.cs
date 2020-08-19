@@ -12,7 +12,7 @@ namespace goOfflineE.Helpers
 
         //Email configurations
         public static string SMTPServer => Environment.GetEnvironmentVariable("SMTP_SERVER");
-        public static Int16 SMTPPort => Convert.ToInt16( Environment.GetEnvironmentVariable("SMTP_PORT"));
+        public static Int16 SMTPPort => Convert.ToInt16(Environment.GetEnvironmentVariable("SMTP_PORT"));
         public static string SMTPUser => Environment.GetEnvironmentVariable("SMTP_USER");
         public static string SMTPPassword => Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 

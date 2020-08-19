@@ -2,33 +2,31 @@
 
 namespace goOfflineE.Models
 {
-    public class TeacherResponse
+    public class StudentRequest : UserRequest
     {
-        public string Id { get; set; }
-
+        [Required]
         public string SchoolId { get; set; }
 
-        public string FirstName { get; set; }
+        [Required]
+        public string ClassId { get; set; }
 
-        public string LastName { get; set; }
-
-        [EmailAddress]
-        public string Email { get; set; }
-
+        [Required]
         public string Address1 { get; set; }
 
         public string Address2 { get; set; }
 
+        [Required]
         public string Country { get; set; }
 
+        [Required]
         public string State { get; set; }
 
+        [Required]
         public string City { get; set; }
 
+        [Required]
         public string Zip { get; set; }
-
         public string Latitude { get; set; }
-
         public string Longitude { get; set; }
     }
 }

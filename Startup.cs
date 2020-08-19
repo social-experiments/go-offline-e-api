@@ -3,7 +3,6 @@ using Aducati.Azure.TableStorage.Repository;
 using AutoMapper;
 using AzureFunctions.Extensions.Swashbuckle;
 using goOfflineE;
-using goOfflineE.Azure.Function.Api.Services;
 using goOfflineE.Helpers;
 using goOfflineE.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -21,7 +20,7 @@ namespace goOfflineE
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            
+
             //This is to generate the Default UI of Swagger Documentation  
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), option =>
             {
@@ -44,6 +43,8 @@ namespace goOfflineE
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IPowerBIService, PowerBIService>();
             services.AddTransient<IClassService, ClassService>();
+            services.AddTransient<IStudentService, StudentService>();
+
 
 
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.TableStorageConnstionString));

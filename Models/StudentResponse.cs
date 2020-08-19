@@ -2,11 +2,13 @@
 
 namespace goOfflineE.Models
 {
-    public class TeacherResponse
+    public class StudentResponse
     {
         public string Id { get; set; }
 
         public string SchoolId { get; set; }
+
+        public string ClassId { get; set; }
 
         public string FirstName { get; set; }
 

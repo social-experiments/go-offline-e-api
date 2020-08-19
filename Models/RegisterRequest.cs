@@ -5,7 +5,7 @@ namespace goOfflineE.Models
 {
     public class RegisterRequest
     {
-       
+
         public string Id { get; set; }
 
         public string SchoolId { get; set; }

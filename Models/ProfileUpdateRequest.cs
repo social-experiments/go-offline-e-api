@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace goOfflineE.Models
 {
-   public class ProfileUpdateRequest
+    public class ProfileUpdateRequest
     {
         [JsonProperty("id")]
         public string Id { get; set; }

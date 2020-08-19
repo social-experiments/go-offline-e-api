@@ -1,9 +1,8 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+﻿using System;
 
 namespace goOfflineE.Entites
 {
-    public class School: BaseEntity
+    public class School : BaseEntity
     {
         public School() { }
         public School(string schoolId, string schoolName)
