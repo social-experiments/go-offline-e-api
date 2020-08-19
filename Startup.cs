@@ -3,6 +3,7 @@ using Aducati.Azure.TableStorage.Repository;
 using AutoMapper;
 using AzureFunctions.Extensions.Swashbuckle;
 using goOfflineE;
+using goOfflineE.Azure.Function.Api.Services;
 using goOfflineE.Helpers;
 using goOfflineE.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -42,6 +43,8 @@ namespace goOfflineE
             services.AddTransient<ITeacherService, TeacherService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IPowerBIService, PowerBIService>();
+            services.AddTransient<IClassService, ClassService>();
+
 
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.TableStorageConnstionString));
         }
