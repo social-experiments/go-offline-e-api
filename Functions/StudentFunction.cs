@@ -1,21 +1,20 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using goOfflineE.Helpers.Attributes;
+using goOfflineE.Models;
+using goOfflineE.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using goOfflineE.Helpers.Attributes;
-using goOfflineE.Services;
 using NSwag.Annotations;
-using goOfflineE.Models;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace goOfflineE.Functions
 {
-    public  class StudentFunction: AuthenticationFilter
+    public class StudentFunction : AuthenticationFilter
     {
         private readonly IStudentService _studentService;
         public StudentFunction(IStudentService studentService)
@@ -50,7 +49,7 @@ namespace goOfflineE.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students/{schoolId}/{classId}")] HttpRequest req, string schoolId, string classId)
         {
             var validateStatus = base.AuthorizationStatus(req);
-           // string schoolId = req.Query["schoolId"];
+            // string schoolId = req.Query["schoolId"];
             //schoolId = schoolId ?? id;
             if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId))
             {

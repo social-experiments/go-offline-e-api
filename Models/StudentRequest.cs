@@ -2,7 +2,7 @@
 
 namespace goOfflineE.Models
 {
-    public class StudentRequest: UserRequest
+    public class StudentRequest : UserRequest
     {
         [Required]
         public string SchoolId { get; set; }

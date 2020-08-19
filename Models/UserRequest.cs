@@ -1,12 +1,10 @@
 ﻿using goOfflineE.Entites;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace goOfflineE.Models
 {
-    public abstract class  UserRequest
+    public abstract class UserRequest
     {
         public string Id { get; set; }
 

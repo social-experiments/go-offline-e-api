@@ -5,7 +5,6 @@ using goOfflineE.Helpers;
 using goOfflineE.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,7 +24,7 @@ namespace goOfflineE.Services
         private readonly ITableStorage _tableStorage;
         private readonly ISchoolService _schoolService;
         private readonly IMapper _mapper;
-        public AccountService(ITableStorage tableStorage, ISchoolService schoolService,IMapper mapper)
+        public AccountService(ITableStorage tableStorage, ISchoolService schoolService, IMapper mapper)
         {
             _tableStorage = tableStorage;
             _schoolService = schoolService;
@@ -53,7 +52,7 @@ namespace goOfflineE.Services
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey);
 
-            var schools = account.Role == Role.Teacher.ToString()? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
+            var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
 
             var response = new AuthenticateResponse
             {

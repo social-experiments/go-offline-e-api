@@ -2,7 +2,7 @@
 
 namespace goOfflineE.Entites
 {
-    public class Teacher: BaseEntity
+    public class Teacher : BaseEntity
     {
         public Teacher() { }
         public Teacher(string schoolId, string userId)

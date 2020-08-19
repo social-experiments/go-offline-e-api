@@ -48,7 +48,10 @@ namespace goOfflineE.Helpers.Attributes
         {
             StringValues keys;
             if (!request.Headers.TryGetValue("AuthorizationStatus", out keys))
+            {
                 return HttpStatusCode.ExpectationFailed;
+            }
+
             Int16 httpStatus = Convert.ToInt16(keys.First());
             return (HttpStatusCode)httpStatus;
 

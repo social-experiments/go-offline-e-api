@@ -1,5 +1,4 @@
-﻿using goOfflineE.Entites;
-using goOfflineE.Models;
+﻿using goOfflineE.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

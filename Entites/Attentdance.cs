@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace goOfflineE.Entites
+﻿namespace goOfflineE.Entites
 {
-    public class Attentdance: BaseEntity
+    public class Attentdance : BaseEntity
     {
         public Attentdance() { }
 

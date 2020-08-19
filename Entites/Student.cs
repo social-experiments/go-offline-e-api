@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace goOfflineE.Entites
 {
-    public class Student: BaseEntity
+    public class Student : BaseEntity
     {
         public Student() { }
 

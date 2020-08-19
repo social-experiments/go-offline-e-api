@@ -20,7 +20,7 @@ namespace goOfflineE
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            
+
             //This is to generate the Default UI of Swagger Documentation  
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), option =>
             {

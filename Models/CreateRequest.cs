@@ -2,10 +2,10 @@ using goOfflineE.Entites;
 using System.ComponentModel.DataAnnotations;
 
 namespace goOfflineE.Models
-{ 
+{
     public class CreateRequest
     {
-        
+
         [Required]
         public string FirstName { get; set; }
 

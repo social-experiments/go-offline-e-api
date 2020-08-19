@@ -3,7 +3,6 @@ using AutoMapper;
 using goOfflineE.Entites;
 using goOfflineE.Helpers;
 using goOfflineE.Models;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -139,24 +138,24 @@ namespace goOfflineE.Services
             TableQuery<Entites.Student> studentQuery = new TableQuery<Entites.Student>().Where(filterString);
             var students = await _tableStorage.QueryAsync<Entites.Student>("Student", studentQuery);
             var studentList = from user in users
-                               join student in students
-                                    on user.RowKey equals student.RowKey
-                               orderby student.UpdatedOn descending
-                               select new StudentResponse
-                               {
-                                   Id = user.RowKey,
-                                   FirstName = user.FirstName,
-                                   LastName = user.LastName,
-                                   Email = user.Email,
-                                   Address1 = student.Address1,
-                                   Address2 = student.Address2,
-                                   Country = student.Country,
-                                   State = student.State,
-                                   City = student.City,
-                                   Zip = student.Zip,
-                                   SchoolId = student.PartitionKey,
-                                   ClassId = student.ClassId
-                               };
+                              join student in students
+                                   on user.RowKey equals student.RowKey
+                              orderby student.UpdatedOn descending
+                              select new StudentResponse
+                              {
+                                  Id = user.RowKey,
+                                  FirstName = user.FirstName,
+                                  LastName = user.LastName,
+                                  Email = user.Email,
+                                  Address1 = student.Address1,
+                                  Address2 = student.Address2,
+                                  Country = student.Country,
+                                  State = student.State,
+                                  City = student.City,
+                                  Zip = student.Zip,
+                                  SchoolId = student.PartitionKey,
+                                  ClassId = student.ClassId
+                              };
 
             return studentList;
         }

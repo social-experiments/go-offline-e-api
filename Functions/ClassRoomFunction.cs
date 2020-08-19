@@ -1,7 +1,7 @@
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using goOfflineE.Services;
 using goOfflineE.Helpers.Attributes;
 using goOfflineE.Models;
+using goOfflineE.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
