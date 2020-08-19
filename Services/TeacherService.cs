@@ -42,7 +42,8 @@ namespace goOfflineE.Services
                 {
                     Email = model.Email,
                     FirstName = model.FirstName,
-                    LastName = model.LastName
+                    LastName = model.LastName,
+                    Id = model.Id
                 };
 
                 await _profileService.UpdateProfile(profileUpdateRequest);

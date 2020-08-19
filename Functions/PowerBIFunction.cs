@@ -18,7 +18,7 @@ namespace goOfflineE.Functions
             _powerBIService = powerService;
         }
 
-        [FunctionName("GetPowerBIAccessToken")]
+        [FunctionName("PowerBIAccessToken")]
         [OpenApiOperation("List", "PowerBI")]
         [DisableCors]
         public async Task<IActionResult> GetPowerBIAccessToken(
