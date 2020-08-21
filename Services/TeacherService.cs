@@ -15,15 +15,13 @@ namespace goOfflineE.Services
     {
         private readonly ITableStorage _tableStorage;
         private readonly IMapper _mapper;
-        private readonly IAccountService _accountService;
         private readonly IProfileService _profileService;
         private readonly IEmailService _emailService;
 
-        public TeacherService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IAccountService accountService, IProfileService profileService)
+        public TeacherService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IProfileService profileService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
-            _accountService = accountService;
             _profileService = profileService;
             _emailService = emailService;
         }
@@ -106,7 +104,7 @@ namespace goOfflineE.Services
                 };
                 try
                 {
-                    await _accountService.Register(registerRequest);
+                    await _profileService.Register(registerRequest);
                     await _tableStorage.AddAsync("Teacher", newTeacher);
                     await NewTeacherNotificationEmail(registerRequest);
                 }

@@ -16,7 +16,6 @@ namespace goOfflineE.Functions
     public class AccountFunction : AuthenticationFilter
     {
         private readonly IAccountService _accountService;
-
         public AccountFunction(IAccountService accountService)
         {
             _accountService = accountService;
@@ -33,19 +32,6 @@ namespace goOfflineE.Functions
             var response = await _accountService.Authenticate(requestData);
 
             return new OkObjectResult(response);
-        }
-
-        [FunctionName("AccountSignup")]
-        public async Task<IActionResult> Register(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "signup")]
-            [RequestBodyType(typeof(RegisterRequest), "New user account request")] HttpRequest request)
-        {
-            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-            RegisterRequest requestData = JsonConvert.DeserializeObject<RegisterRequest>(requestBody);
-
-            await _accountService.Register(requestData);
-
-            return new OkObjectResult(new { message = "Registration successful." });
         }
 
         [FunctionName("AccountResetPassword")]
