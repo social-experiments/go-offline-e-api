@@ -69,9 +69,20 @@ namespace goOfflineE.Services
             return response;
         }
 
-        public Task VerifyEmail(string token)
+        public async Task<bool> VerifyEmail(string email)
         {
-            throw new NotImplementedException();
+            // validate
+            TableQuery<User> query = new TableQuery<User>()
+                   .Where(TableQuery.GenerateFilterCondition("Email", QueryComparisons.Equal, email));
+            var users = await _tableStorage.QueryAsync<User>("User", query);
+            var account = users.SingleOrDefault();
+
+            if (account == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public Task ForgotPassword(ForgotPasswordRequest model)
