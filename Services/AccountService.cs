@@ -69,51 +69,6 @@ namespace goOfflineE.Services
             return response;
         }
 
-        public async Task<object> Register(RegisterRequest model)
-        {
-            // validate
-            var users = await _tableStorage.GetAllAsync<User>("User");
-
-            if (users.Any(x => x.Email == model.Email))
-            {
-                var resp = new HttpResponseMessage(HttpStatusCode.AlreadyReported)
-                {
-                    Content = new StringContent(string.Format($"User { model.Email} already registred!")),
-                    ReasonPhrase = "Already registred!"
-                };
-                throw new HttpResponseException(resp);
-            }
-
-            var defaultPasswrod = model.Password ?? "p@ssw0rd";
-            var userId = model.Id ?? Guid.NewGuid().ToString();
-            var schoolId = model.SchoolId ?? userId;
-
-            var newUser = new User(schoolId, userId)
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PasswordHash = BC.HashPassword(defaultPasswrod),
-                Role = model.Role,
-                Active = true,
-                Verified = DateTime.UtcNow,
-                PasswordReset = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedOn = DateTime.UtcNow,
-                UpdatedBy = userId,
-                ForceChangePasswordNextLogin = true
-            };
-
-            try
-            {
-                return await _tableStorage.AddAsync("User", newUser);
-            }
-            catch (Exception ex)
-            {
-                throw new AppException("Registration Error: ", ex.InnerException);
-            }
-        }
-
         public Task VerifyEmail(string token)
         {
             throw new NotImplementedException();

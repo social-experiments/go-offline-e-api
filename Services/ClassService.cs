@@ -14,11 +14,13 @@ namespace goOfflineE.Services
     {
         private readonly ITableStorage _tableStorage;
         private readonly IMapper _mapper;
+        private readonly IStudentService _studentService;
 
-        public ClassService(ITableStorage tableStorage, IMapper mapper)
+        public ClassService(ITableStorage tableStorage, IMapper mapper, IStudentService studentService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
+            _studentService = studentService;
         }
 
         public async Task CreateUpdate(ClassRoom model)
@@ -78,18 +80,25 @@ namespace goOfflineE.Services
 
             TableQuery<Entites.ClassRoom> classQuery = new TableQuery<Entites.ClassRoom>()
                   .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
-            var classRooms = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", classQuery);
-            var classList = from classRoom in classRooms
+            var classRoomQuery = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", classQuery);
+            var classList = from classRoom in classRoomQuery
                             orderby classRoom.UpdatedOn descending
-                            select new ClassRoom
-                            {
-                                ClassId = classRoom.RowKey,
-                                SchoolId = classRoom.PartitionKey,
-                                ClassDivision = classRoom.ClassDivision,
-                                ClassRoomName = classRoom.ClassRoomName,
-                            };
+                            select classRoom;
+            var classRoomList = new List<ClassRoom>();
+            foreach (var classRoom in classList)
+            {
+                var students = await _studentService.GetAll(classRoom.PartitionKey, classRoom.RowKey);
+                classRoomList.Add(new ClassRoom
+                {
+                    ClassId = classRoom.RowKey,
+                    SchoolId = classRoom.PartitionKey,
+                    ClassRoomName = classRoom.ClassRoomName,
+                    ClassDivision = classRoom.ClassDivision,
+                    Students = students.ToList()
+                }); 
+            }
 
-            return classList;
+            return classRoomList;
         }
     }
 }

@@ -14,10 +14,13 @@ namespace goOfflineE.Services
     {
         private readonly ITableStorage _tableStorage;
         private readonly IMapper _mapper;
-        public SchoolService(ITableStorage tableStorage, IMapper mapper)
+        private readonly IClassService _classService;
+
+        public SchoolService(ITableStorage tableStorage, IMapper mapper, IClassService classService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
+            _classService = classService;
         }
         public async Task CreateUpdate(SchoolRequest model)
         {
@@ -89,7 +92,12 @@ namespace goOfflineE.Services
         {
             var allSchools = await _tableStorage.GetAllAsync<Entites.School>("School");
             var schools = string.IsNullOrEmpty(schoolId) ? allSchools : allSchools.Where(school => school.RowKey == schoolId);
-            return this._mapper.Map<IEnumerable<Models.School>>(schools);
+            var schoolData = this._mapper.Map<IEnumerable<Models.School>>(schools);
+            foreach (var school in schoolData)
+            {
+                school.ClassRooms = await _classService.GetAll(school.Id);
+            }
+            return schoolData;
         }
 
     }

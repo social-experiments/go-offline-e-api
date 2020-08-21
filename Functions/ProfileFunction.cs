@@ -49,5 +49,18 @@ namespace goOfflineE.Functions
             }
             return new OkObjectResult(new { message = "Profile update successfully." });
         }
+
+        [FunctionName("UserSignup")]
+        public async Task<IActionResult> Register(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "signup")]
+            [RequestBodyType(typeof(RegisterRequest), "New user signup request")] HttpRequest request)
+        {
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            RegisterRequest requestData = JsonConvert.DeserializeObject<RegisterRequest>(requestBody);
+
+            await _profileService.Register(requestData);
+
+            return new OkObjectResult(new { message = "Registration successful." });
+        }
     }
 }

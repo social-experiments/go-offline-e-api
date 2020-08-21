@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace goOfflineE.Models
 {
     public class School
     {
+        public School()
+        {
+            this.ClassRooms = new List<ClassRoom>();
+
+        }
         public string Id { get; set; }
         public string Name { get; set; }
         public string Address1 { get; set; }
@@ -17,5 +23,7 @@ namespace goOfflineE.Models
         public DateTime? SyncDateTime { get; set; }
 
         public string CreatedBy { get; set; }
+        public IEnumerable<ClassRoom> ClassRooms { get; set; }
+
     }
 }
