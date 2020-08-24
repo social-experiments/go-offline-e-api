@@ -44,10 +44,9 @@ namespace goOfflineE
             services.AddTransient<IPowerBIService, PowerBIService>();
             services.AddTransient<IClassService, ClassService>();
             services.AddTransient<IStudentService, StudentService>();
+            services.AddTransient<IAzureBlobService, AzureBlobService>();
 
-
-
-            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.TableStorageConnstionString));
+            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
         }
     }
 

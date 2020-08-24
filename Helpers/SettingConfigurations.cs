@@ -16,8 +16,10 @@ namespace goOfflineE.Helpers
         public static string SMTPUser => Environment.GetEnvironmentVariable("SMTP_USER");
         public static string SMTPPassword => Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
-        //Table storage connection string
-        public static string TableStorageConnstionString => Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        //Azure storage
+        public static string AzureWebJobsStorage => Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        public static string AccountKey => Environment.GetEnvironmentVariable("AccountKey");
+        
 
         public static string GetRandomPassword(int length)
         {
