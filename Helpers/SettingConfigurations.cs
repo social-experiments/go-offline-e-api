@@ -19,7 +19,11 @@ namespace goOfflineE.Helpers
         //Azure storage
         public static string AzureWebJobsStorage => Environment.GetEnvironmentVariable("AzureWebJobsStorage");
         public static string AccountKey => Environment.GetEnvironmentVariable("AccountKey");
-        
+
+        //Cognitive service
+        public static string CognitiveServiceKey => Environment.GetEnvironmentVariable("CognitiveServiceKey");
+        public static string CognitiveServiceEndPoint => Environment.GetEnvironmentVariable("CognitiveServiceEndPoint");
+
 
         public static string GetRandomPassword(int length)
         {

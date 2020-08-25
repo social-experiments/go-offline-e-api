@@ -1,13 +1,10 @@
-﻿using goOfflineE.Helpers;
-using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System;
-using Azure.Storage.Blobs;
-using Azure.Storage;
+﻿using Azure.Storage;
 using Azure.Storage.Sas;
-using Azure.Storage.Blobs.Specialized;
+using goOfflineE.Helpers;
 using goOfflineE.Models;
+using Microsoft.WindowsAzure.Storage;
+using System;
+using System.Threading.Tasks;
 
 namespace goOfflineE.Services
 {
@@ -15,7 +12,7 @@ namespace goOfflineE.Services
     {
         public async Task<BlobStorageRequest> GetSasUri(string containerName)
         {
-          
+
             // connect to our storage account and create a blob client
             var connectionString = SettingConfigurations.AzureWebJobsStorage;
             var storageAccount = CloudStorageAccount.Parse(connectionString);

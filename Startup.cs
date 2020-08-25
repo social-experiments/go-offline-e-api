@@ -5,6 +5,7 @@ using AzureFunctions.Extensions.Swashbuckle;
 using goOfflineE;
 using goOfflineE.Helpers;
 using goOfflineE.Services;
+using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -45,8 +46,12 @@ namespace goOfflineE
             services.AddTransient<IClassService, ClassService>();
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<IAzureBlobService, AzureBlobService>();
+            services.AddTransient<ICognitiveService, CognitiveService>();
 
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
+            services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),
+            new System.Net.Http.DelegatingHandler[] { }));
+
         }
     }
 

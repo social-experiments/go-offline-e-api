@@ -7,7 +7,7 @@ namespace goOfflineE.Services
     public interface IAccountService
     {
         Task<AuthenticateResponse> Authenticate(AuthenticateRequest model);
-        Task <bool>VerifyEmail(string email);
+        Task<bool> VerifyEmail(string email);
         Task ForgotPassword(ForgotPasswordRequest model);
         Task ResetPassword(ResetPasswordRequest model);
         Task<IEnumerable<AccountResponse>> GetAll();
