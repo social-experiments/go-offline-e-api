@@ -1,4 +1,6 @@
-﻿using goOfflineE.Models;
+﻿using goOfflineE.Entites;
+using goOfflineE.Models;
+using Microsoft.Azure.WebJobs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,8 +10,8 @@ namespace goOfflineE.Services
 {
     public interface ICognitiveService
     {
-        Task TrainStudentModel(TrainStudentFace trainStudentFace);
+        Task TrainStudentModel(QueueDataMessage queueDataMessage);
 
-        Task ProcessAttendance(AttendancePhoto attendancePhoto);
+        Task ProcessAttendance(QueueDataMessage queueDataMessage);
     }
 }

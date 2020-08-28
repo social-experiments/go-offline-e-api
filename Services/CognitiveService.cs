@@ -1,10 +1,17 @@
-﻿using goOfflineE.Helpers;
+﻿using Aducati.Azure.TableStorage.Repository;
+using goOfflineE.Entites;
+using goOfflineE.Helpers;
 using goOfflineE.Models;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace goOfflineE.Services
@@ -12,9 +19,14 @@ namespace goOfflineE.Services
     public class CognitiveService : ICognitiveService
     {
         private readonly IFaceClient _faceClient;
-        public CognitiveService(IFaceClient faceClient)
+        private readonly IAzureBlobService _azureBlobService;
+        private readonly ITableStorage _tableStorage;
+
+        public CognitiveService(IFaceClient faceClient, IAzureBlobService azureBlobService, ITableStorage tableStorage)
         {
             _faceClient = faceClient;
+            _azureBlobService = azureBlobService;
+            _tableStorage = tableStorage;
 
             if (Uri.IsWellFormedUriString(SettingConfigurations.CognitiveServiceEndPoint, UriKind.Absolute))
             {
@@ -22,26 +34,37 @@ namespace goOfflineE.Services
             }
         }
 
-        public async Task TrainStudentModel(TrainStudentFace trainStudentFace)
+        public async Task TrainStudentModel(QueueDataMessage queueDataMessage)
         {
+            //Create school group
+            CreateGroup(queueDataMessage.SchoolId);
+
             try
             {
+
                 // Define school specific student
                 Person student = await _faceClient.PersonGroupPerson.CreateAsync(
                     // Id of the PersonGroup that the person belonged to
-                    trainStudentFace.SchoolId,
+                    queueDataMessage.SchoolId,
                     // studentId
-                    trainStudentFace.StudentId
+                    queueDataMessage.StudentId
                 ).ConfigureAwait(false);
 
-                Guid studentId = Guid.Parse(trainStudentFace.StudentId);
+                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("student-photos");
 
-                // Add faces
-                await _faceClient.PersonGroupPerson.AddFaceFromStreamAsync(
-                    trainStudentFace.SchoolId, studentId, trainStudentFace.Photo).ConfigureAwait(false);
+                foreach (var blobUri in queueDataMessage.PictureURLs)
+                {
+                    var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}student-photos/{blobUri}")
+                    {
+                        Query = blobStorage.StorageAccessToken
+                    };
+
+                    await _faceClient.PersonGroupPerson.AddFaceFromUrlAsync(queueDataMessage.SchoolId, student.PersonId, blobUriBuilder.Uri.AbsoluteUri);
+                }
 
                 // Train the PersonGroup
-                await _faceClient.PersonGroup.TrainAsync(trainStudentFace.SchoolId).ConfigureAwait(false);
+                await _faceClient.PersonGroup.TrainAsync(queueDataMessage.SchoolId).ConfigureAwait(false);
+
             }
             // Catch and display Face API errors.
             catch (APIErrorException ex)
@@ -56,44 +79,50 @@ namespace goOfflineE.Services
 
         }
 
-        // Uploads the image file and calls DetectWithStreamAsync.
-        public async Task  ProcessAttendance(AttendancePhoto attendancePhoto)
+        // Uploads the image file and calls DetectWithUrlAsync.
+        public async Task ProcessAttendance(QueueDataMessage queueDataMessage)
         {
             // The list of Face attributes to return.
-            IList<FaceAttributeType> faceAttributes =
-                new FaceAttributeType[]
-                {
-                    FaceAttributeType.Age, 
-                    FaceAttributeType.Gender
-                };
+            //IList<FaceAttributeType> faceAttributes =
+            //    new FaceAttributeType[]
+            //    {
+            //        FaceAttributeType.Age,
+            //        FaceAttributeType.Gender
+            //    };
 
             // Call the Face API.
             try
             {
-                    // The second argument specifies to return the faceId, while
-                    // the third argument specifies not to return face landmarks.
-                    IList<DetectedFace> faceList =
-                        await _faceClient.Face.DetectWithStreamAsync(
-                            attendancePhoto.Photo, true, false, (IList<FaceAttributeType?>)faceAttributes).ConfigureAwait(false);
+                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("attendance-photo");
+                var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}attendance-photo/{queueDataMessage.PictureURLs[0]}")
+                {
+                    Query = blobStorage.StorageAccessToken
+                };
 
-                IList<Guid> faceIds = faceList.Select(face => face.FaceId.Value).ToArray();
+                IList<DetectedFace> faceList =
+                    await _faceClient.Face.DetectWithUrlAsync(blobUriBuilder.Uri.AbsoluteUri).ConfigureAwait(false);
 
-                var results = await _faceClient.Face.IdentifyAsync((IList<Guid?>)faceIds, attendancePhoto.SchoolId, null, 1, 0.5).ConfigureAwait(false);
-                    foreach (var identifyResult in results)
+                IList<Guid?> faceIds = faceList.Select(face => face.FaceId).ToArray();
+
+                var results = await _faceClient.Face.IdentifyAsync(faceIds, queueDataMessage.SchoolId, null, 1, 0.5).ConfigureAwait(false);
+                foreach (var identifyResult in results)
+                {
+                    if (identifyResult.Candidates.Count() == 0)
                     {
-                        if (identifyResult.Candidates.Count() == 0)
-                        {
-                            Console.WriteLine("No one identified");
-                        }
-                        else
-                        {
-                            // Get top 1 among all candidates returned
-                            var candidateId = identifyResult.Candidates[0].PersonId;
-                            var person = await _faceClient.PersonGroupPerson.GetAsync(attendancePhoto.SchoolId, candidateId).ConfigureAwait(false);
-                            Console.WriteLine("Identified as {0}", person.Name);
-                            var studentId = person.Name;
-                        }
+                        Console.WriteLine("No one identified");
                     }
+                    else
+                    {
+                        // Get top 1 among all candidates returned
+                        var candidateId = identifyResult.Candidates[0].PersonId;
+                        var person = await _faceClient.PersonGroupPerson.GetAsync(queueDataMessage.SchoolId, candidateId).ConfigureAwait(false);
+                        Console.WriteLine("Identified as {0}", person.Name);
+                        var studentId = person.Name;
+                        var attaintance = new Attentdance(queueDataMessage.SchoolId, studentId);
+                        attaintance.Timestamp = DateTime.UtcNow;
+                        await _tableStorage.AddAsync("Attentdance", attaintance);
+                    }
+                }
             }
             // Catch and display Face API errors.
             catch (APIErrorException ex)
@@ -105,6 +134,36 @@ namespace goOfflineE.Services
             {
                 throw new AppException("Process Attendance Cognitive Service Error: ", ex.InnerException);
             }
+        }
+
+        private QueueDataMessage GetPictureData(Stream jsonBlob, ILogger log)
+        {
+            QueueDataMessage result = new QueueDataMessage();
+            var serializer = new JsonSerializer();
+            using (StreamReader reader = new StreamReader(jsonBlob))
+            {
+                using (var jsonTextReader = new JsonTextReader(reader))
+                {
+                    result = serializer.Deserialize<QueueDataMessage>(jsonTextReader);
+                }
+            }
+
+            log.LogInformation($"Successfully parsed JSON blob");
+            return result;
+        }
+
+        private void CreateGroup(string personGroupId)
+        {
+            try
+            {
+                //Create school group
+                _faceClient.PersonGroup.CreateAsync(personGroupId, "School Group").GetAwaiter().GetResult();
+            }
+            catch
+            {
+
+            }
+
         }
     }
 }

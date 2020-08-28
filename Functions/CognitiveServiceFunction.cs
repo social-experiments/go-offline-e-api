@@ -1,8 +1,14 @@
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using goOfflineE.Entites;
 using goOfflineE.Models;
 using goOfflineE.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,53 +23,65 @@ namespace goOfflineE.Functions
             _cognitiveService = cognitiveService;
         }
 
-        [FunctionName("TrainStudentPhotoFunction")]
-        public void TrainStudentPhoto([BlobTrigger("student-ptotos/{blobName}", Connection = "AzureWebJobsStorage")] Stream imageBlob, string blobName, ILogger log)
+        
+
+        //[FunctionName("ProcessAttendanceFunction")]
+        //public void ProcessAttendance(
+        //    [BlobTrigger("attendance-photo/{blobName}", Connection = "AzureWebJobsStorage")] Stream attendanceBlob, string blobName, ILogger log, 
+        //    [Table("Attendance")] ICollector<Attentdance> attentdanceData)
+        //{
+        //    log.LogInformation($"C# Blob trigger function Processed blob\n Name:{blobName} \n Size: {attendanceBlob.Length} Bytes");
+
+        //    string[] nameParts = blobName.Split(new char[] { '/' });
+        //    if (nameParts.Length != 2)
+        //    {
+        //        log.LogError("File name is in invalid format, expected schoolId/PhotoName");
+        //    }
+
+        //    AttendancePhoto attendancePhoto  = new AttendancePhoto()
+        //    {
+        //        SchoolId = nameParts[0],
+        //        Photo = attendanceBlob,
+        //    };
+        //    log.LogInformation($"Start process attendance in cognitive services");
+
+        //    Task.Run(async () => await _cognitiveService.ProcessAttendance(attendancePhoto, attentdanceData)).ConfigureAwait(false);
+
+        //    log.LogInformation($"End process attendance in cognitive services");
+        //}
+
+        [FunctionName("QueueMessage")]
+        public async Task<IActionResult> QueueMessage(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "queue/message")]
+            [RequestBodyType(typeof(QueueDataMessage), "Queue Message")] HttpRequest request,
+             [Queue("queue-message")] ICollector<QueueDataMessage> attentdanceData)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{blobName} \n Size: {imageBlob.Length} Bytes");
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            QueueDataMessage requestData = JsonConvert.DeserializeObject<QueueDataMessage>(requestBody);
 
-            string[] nameParts = blobName.Split(new char[] { '/' });
-            if (nameParts.Length != 3)
-            {
-                log.LogError("File name is in invalid format, expected schoolId/studentId/PhotoName");
-            }
+            attentdanceData.Add(requestData);
 
-            TrainStudentFace trainStudentFace = new TrainStudentFace()
-            {
-                SchoolId = nameParts[0],
-                StudentId = nameParts[1],
-                Photo = imageBlob,
-            };
-            log.LogInformation($"Start train student model in cognitive services");
-
-            Task.Run(async () => await _cognitiveService.TrainStudentModel(trainStudentFace)).ConfigureAwait(false);
-            
-            log.LogInformation($"End train student model in cognitive services");
+            return new OkObjectResult(new { message = "Queueed message successful." });
         }
 
-        [FunctionName("ProcessAttendanceFunction")]
-        public void ProcessAttendance(
-            [BlobTrigger("attendance-ptoto/{blobName}", Connection = "AzureWebJobsStorage")] Stream attendanceBlob, string blobName, ILogger log, 
-            [Table("TakmilTable")] ICollector<ConnectionLog> outputTable)
+        [FunctionName("ProcessQueueMessage")]
+        public void ProcessQueueMessage([QueueTrigger("queue-message", Connection = "AzureWebJobsStorage")] string queueMessage, ILogger log)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{blobName} \n Size: {attendanceBlob.Length} Bytes");
+            log.LogInformation($"C# Queue trigger function processed: {queueMessage}");
 
-            string[] nameParts = blobName.Split(new char[] { '/' });
-            if (nameParts.Length != 2)
+            QueueDataMessage queuedData = JsonConvert.DeserializeObject<QueueDataMessage>(queueMessage);
+
+            log.LogInformation($"Start processing cognitive services.");
+            if (!string.IsNullOrEmpty(queuedData.StudentId))
             {
-                log.LogError("File name is in invalid format, expected schoolId/PhotoName");
+                Task.Run(async () => await _cognitiveService.TrainStudentModel(queuedData)).ConfigureAwait(false);
+            }
+            else
+            {
+                Task.Run(async () => await _cognitiveService.ProcessAttendance(queuedData)).ConfigureAwait(false);
             }
 
-            AttendancePhoto attendancePhoto  = new AttendancePhoto()
-            {
-                SchoolId = nameParts[0],
-                Photo = attendanceBlob,
-            };
-            log.LogInformation($"Start process attendance in cognitive services");
-
-            Task.Run(async () => await _cognitiveService.ProcessAttendance(attendancePhoto)).ConfigureAwait(false);
-
-            log.LogInformation($"End process attendance in cognitive services");
+            log.LogInformation($"End processing cognitive services.");
         }
     }
 }
