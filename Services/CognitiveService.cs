@@ -4,14 +4,12 @@ using goOfflineE.Helpers;
 using goOfflineE.Models;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace goOfflineE.Services
@@ -50,11 +48,11 @@ namespace goOfflineE.Services
                     queueDataMessage.StudentId
                 ).ConfigureAwait(false);
 
-                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("student-photos");
+                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("students");
 
                 foreach (var blobUri in queueDataMessage.PictureURLs)
                 {
-                    var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}student-photos/{blobUri}")
+                    var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}students/{blobUri}")
                     {
                         Query = blobStorage.StorageAccessToken
                     };
@@ -93,8 +91,8 @@ namespace goOfflineE.Services
             // Call the Face API.
             try
             {
-                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("attendance-photo");
-                var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}attendance-photo/{queueDataMessage.PictureURLs[0]}")
+                BlobStorageRequest blobStorage = await _azureBlobService.GetSasUri("attendance");
+                var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}attendance/{queueDataMessage.PictureURLs[0]}")
                 {
                     Query = blobStorage.StorageAccessToken
                 };
@@ -118,8 +116,19 @@ namespace goOfflineE.Services
                         var person = await _faceClient.PersonGroupPerson.GetAsync(queueDataMessage.SchoolId, candidateId).ConfigureAwait(false);
                         Console.WriteLine("Identified as {0}", person.Name);
                         var studentId = person.Name;
-                        var attaintance = new Attentdance(queueDataMessage.SchoolId, studentId);
-                        attaintance.Timestamp = DateTime.UtcNow;
+                        var attaintance = new Attentdance(queueDataMessage.SchoolId, Guid.NewGuid().ToString())
+                        {
+                            StudentId = studentId,
+                            ClassRoomId = queueDataMessage.ClassId,
+                            TeacherId = queueDataMessage.TeacherId,
+                            CreatedBy = queueDataMessage.TeacherId,
+                            UpdatedBy = queueDataMessage.TeacherId,
+                            UpdatedOn = DateTime.UtcNow,
+                            Timestamp = queueDataMessage.PictureTimestamp,
+                            Latitude = queueDataMessage.Latitude,
+                            Longitude = queueDataMessage.Longitude,
+                            Present = true
+                        };
                         await _tableStorage.AddAsync("Attentdance", attaintance);
                     }
                 }

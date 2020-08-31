@@ -11,10 +11,12 @@
         }
 
         public string ClassRoomId { get; set; }
+        public string StudentId { get; set; }
+        public string CourseId { get; set; }
+
         public string TeacherId { get; set; }
-        public int Girls { get; set; }
-        public int Boys { get; set; }
-        public int Total { get; set; }
-        public string ImagePath { get; set; }
+        public bool Present { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
     }
 }
