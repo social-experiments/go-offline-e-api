@@ -1,17 +1,13 @@
-﻿using goOfflineE.Entites;
-using goOfflineE.Models;
-using Microsoft.Azure.WebJobs;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using goOfflineE.Models;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace goOfflineE.Services
 {
     public interface ICognitiveService
     {
-        Task TrainStudentModel(QueueDataMessage queueDataMessage);
+        Task TrainStudentModel(QueueDataMessage queueDataMessage, ILogger log);
 
-        Task ProcessAttendance(QueueDataMessage queueDataMessage);
+        Task ProcessAttendance(QueueDataMessage queueDataMessage, ILogger log);
     }
 }

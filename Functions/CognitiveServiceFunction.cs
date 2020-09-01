@@ -1,14 +1,16 @@
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using goOfflineE.Entites;
+using goOfflineE.Helpers;
 using goOfflineE.Models;
 using goOfflineE.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -23,43 +25,34 @@ namespace goOfflineE.Functions
             _cognitiveService = cognitiveService;
         }
 
-        
-
-        //[FunctionName("ProcessAttendanceFunction")]
-        //public void ProcessAttendance(
-        //    [BlobTrigger("attendance-photo/{blobName}", Connection = "AzureWebJobsStorage")] Stream attendanceBlob, string blobName, ILogger log, 
-        //    [Table("Attendance")] ICollector<Attentdance> attentdanceData)
-        //{
-        //    log.LogInformation($"C# Blob trigger function Processed blob\n Name:{blobName} \n Size: {attendanceBlob.Length} Bytes");
-
-        //    string[] nameParts = blobName.Split(new char[] { '/' });
-        //    if (nameParts.Length != 2)
-        //    {
-        //        log.LogError("File name is in invalid format, expected schoolId/PhotoName");
-        //    }
-
-        //    AttendancePhoto attendancePhoto  = new AttendancePhoto()
-        //    {
-        //        SchoolId = nameParts[0],
-        //        Photo = attendanceBlob,
-        //    };
-        //    log.LogInformation($"Start process attendance in cognitive services");
-
-        //    Task.Run(async () => await _cognitiveService.ProcessAttendance(attendancePhoto, attentdanceData)).ConfigureAwait(false);
-
-        //    log.LogInformation($"End process attendance in cognitive services");
-        //}
-
         [FunctionName("QueueMessage")]
         public async Task<IActionResult> QueueMessage(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "queue/message")]
-            [RequestBodyType(typeof(QueueDataMessage), "Queue Message")] HttpRequest request,
-             [Queue("queue-message")] ICollector<QueueDataMessage> attentdanceData)
+            [RequestBodyType(typeof(QueueDataMessage), "Queue Message")] HttpRequest request)
         {
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
             QueueDataMessage requestData = JsonConvert.DeserializeObject<QueueDataMessage>(requestBody);
 
-            attentdanceData.Add(requestData);
+            requestData.QueueCreateTime = DateTime.UtcNow;
+
+            // Parse the connection string   
+            // Return a reference to the storage account.  
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
+
+            // Create the queue client.  
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+
+            // Retrieve queue reference from the container  
+            CloudQueue queue = queueClient.GetQueueReference("queue-message");
+
+            // Create queue if it does not exist  
+            await queue.CreateIfNotExistsAsync();
+
+            //Create message   
+            CloudQueueMessage message = new CloudQueueMessage(JsonConvert.SerializeObject(requestData));
+
+            //Add message to queue  
+            await queue.AddMessageAsync(message);
 
             return new OkObjectResult(new { message = "Queueed message successful." });
         }
@@ -74,11 +67,11 @@ namespace goOfflineE.Functions
             log.LogInformation($"Start processing cognitive services.");
             if (!string.IsNullOrEmpty(queuedData.StudentId))
             {
-                Task.Run(async () => await _cognitiveService.TrainStudentModel(queuedData)).ConfigureAwait(false);
+                Task.Run(async () => await _cognitiveService.TrainStudentModel(queuedData, log)).ConfigureAwait(false);
             }
             else
             {
-                Task.Run(async () => await _cognitiveService.ProcessAttendance(queuedData)).ConfigureAwait(false);
+                Task.Run(async () => await _cognitiveService.ProcessAttendance(queuedData, log)).ConfigureAwait(false);
             }
 
             log.LogInformation($"End processing cognitive services.");

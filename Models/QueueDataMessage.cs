@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace goOfflineE.Models
 {
@@ -34,6 +33,9 @@ namespace goOfflineE.Models
 
         [JsonProperty("longitude")]
         public string Longitude { get; set; }
+
+        [JsonProperty("queueCreateTime")]
+        public DateTime QueueCreateTime { get; set; }
 
     }
 }
