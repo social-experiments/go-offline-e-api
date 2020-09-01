@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace goOfflineE.Models
+﻿namespace goOfflineE.Models
 {
     public class BlobStorageRequest
     {

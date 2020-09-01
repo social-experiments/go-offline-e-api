@@ -95,7 +95,7 @@ namespace goOfflineE.Services
                     ClassRoomName = classRoom.ClassRoomName,
                     ClassDivision = classRoom.ClassDivision,
                     Students = students.ToList()
-                }); 
+                });
             }
 
             return classRoomList;
