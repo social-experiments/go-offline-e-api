@@ -1,21 +1,41 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using AutoMapper;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using Aducati.Azure.TableStorage.Repository;
+    using AutoMapper;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="ClassService" />.
+    /// </summary>
     public class ClassService : IClassService
     {
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
+
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Defines the _studentService.
+        /// </summary>
         private readonly IStudentService _studentService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassService"/> class.
+        /// </summary>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
+        /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
         public ClassService(ITableStorage tableStorage, IMapper mapper, IStudentService studentService)
         {
             _tableStorage = tableStorage;
@@ -23,6 +43,11 @@ namespace goOfflineE.Services
             _studentService = studentService;
         }
 
+        /// <summary>
+        /// The CreateUpdate.
+        /// </summary>
+        /// <param name="model">The model<see cref="ClassRoom"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateUpdate(ClassRoom model)
         {
             TableQuery<Entites.ClassRoom> query = new TableQuery<Entites.ClassRoom>()
@@ -75,6 +100,11 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{ClassRoom}}"/>.</returns>
         public async Task<IEnumerable<ClassRoom>> GetAll(string schoolId = "")
         {
 

@@ -1,31 +1,68 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using AutoMapper;
-using goOfflineE.Entites;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using Aducati.Azure.TableStorage.Repository;
+    using AutoMapper;
+    using goOfflineE.Entites;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="StudentService" />.
+    /// </summary>
     public class StudentService : IStudentService
     {
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
+
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Defines the _profileService.
+        /// </summary>
         private readonly IProfileService _profileService;
+
+        /// <summary>
+        /// Defines the _emailService.
+        /// </summary>
         private readonly IEmailService _emailService;
 
-        public StudentService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IProfileService profileService)
+        /// <summary>
+        /// Defines the _azureBlobService.
+        /// </summary>
+        private readonly IAzureBlobService _azureBlobService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StudentService"/> class.
+        /// </summary>
+        /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
+        /// <param name="profileService">The profileService<see cref="IProfileService"/>.</param>
+        /// <param name="azureBlobService">The azureBlobService<see cref="IAzureBlobService"/>.</param>
+        public StudentService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IProfileService profileService, IAzureBlobService azureBlobService)
         {
             _tableStorage = tableStorage;
             _mapper = mapper;
             _profileService = profileService;
             _emailService = emailService;
+            _azureBlobService = azureBlobService;
         }
 
+        /// <summary>
+        /// The CreateUpdate.
+        /// </summary>
+        /// <param name="model">The model<see cref="StudentRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateUpdate(StudentRequest model)
         {
             TableQuery<Entites.Student> query = new TableQuery<Entites.Student>()
@@ -117,6 +154,12 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{StudentResponse}}"/>.</returns>
         public async Task<IEnumerable<StudentResponse>> GetAll(string schoolId, string classId)
         {
             TableQuery<Entites.User> userQuery = new TableQuery<Entites.User>()
@@ -135,6 +178,7 @@ namespace goOfflineE.Services
 
             TableQuery<Entites.Student> studentQuery = new TableQuery<Entites.Student>().Where(filterString);
             var students = await _tableStorage.QueryAsync<Entites.Student>("Student", studentQuery);
+
             var studentList = from user in users
                               join student in students
                                    on user.RowKey equals student.RowKey
@@ -152,10 +196,41 @@ namespace goOfflineE.Services
                                   City = student.City,
                                   Zip = student.Zip,
                                   SchoolId = student.PartitionKey,
-                                  ClassId = student.ClassId
+                                  ClassId = student.ClassId,
+                                  ProfileStoragePath = student.ProfileStoragePath,
+                                  TrainStudentModel = student.TrainStudentModel
                               };
 
             return studentList;
+        }
+
+        /// <summary>
+        /// The UpdateStatusToTrainStudentModel.
+        /// </summary>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <param name="blobURL">The blobURL<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task UpdateStudentProfile(string studentId, string blobURL)
+        {
+            TableQuery<Entites.Student> query = new TableQuery<Entites.Student>()
+                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, studentId));
+            var studentQuery = await _tableStorage.QueryAsync<Entites.Student>("Student", query);
+            var student = studentQuery.SingleOrDefault();
+            student.TrainStudentModel = true;
+
+            if (string.IsNullOrEmpty(student.ProfileStoragePath))
+            {
+                student.ProfileStoragePath = blobURL;
+            }
+
+            try
+            {
+                await _tableStorage.UpdateAsync("Student", student);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("UpdateStatusToTrainStudentModel error: ", ex.InnerException);
+            }
         }
     }
 }
