@@ -1,29 +1,50 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using AutoMapper;
-using goOfflineE.Entites;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using BC = BCrypt.Net.BCrypt;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using Aducati.Azure.TableStorage.Repository;
+    using AutoMapper;
+    using goOfflineE.Entites;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using Microsoft.IdentityModel.Tokens;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Collections.Generic;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Security.Claims;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+    using BC = BCrypt.Net.BCrypt;
+
+    /// <summary>
+    /// Defines the <see cref="AccountService" />.
+    /// </summary>
     public class AccountService : IAccountService
     {
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
+
+        /// <summary>
+        /// Defines the _schoolService.
+        /// </summary>
         private readonly ISchoolService _schoolService;
+
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountService"/> class.
+        /// </summary>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="schoolService">The schoolService<see cref="ISchoolService"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         public AccountService(ITableStorage tableStorage, ISchoolService schoolService, IMapper mapper)
         {
             _tableStorage = tableStorage;
@@ -31,14 +52,16 @@ namespace goOfflineE.Services
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// The Authenticate.
+        /// </summary>
+        /// <param name="model">The model<see cref="AuthenticateRequest"/>.</param>
+        /// <returns>The <see cref="Task{AuthenticateResponse}"/>.</returns>
         public async Task<AuthenticateResponse> Authenticate(AuthenticateRequest model)
         {
             // validate
-            TableQuery<User> query = new TableQuery<User>()
-                   .Where(TableQuery.GenerateFilterCondition("Email", QueryComparisons.Equal, model.Email));
-            var users = await _tableStorage.QueryAsync<User>("User", query);
-
-            var account = users.SingleOrDefault();
+            var users = await _tableStorage.GetAllAsync<User>("User");
+            var account = users.SingleOrDefault(user => user.Email.ToLower() == model.Email.ToLower());
 
             if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
             {
@@ -69,6 +92,11 @@ namespace goOfflineE.Services
             return response;
         }
 
+        /// <summary>
+        /// The VerifyEmail.
+        /// </summary>
+        /// <param name="email">The email<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> VerifyEmail(string email)
         {
             // validate
@@ -85,11 +113,21 @@ namespace goOfflineE.Services
             return true;
         }
 
+        /// <summary>
+        /// The ForgotPassword.
+        /// </summary>
+        /// <param name="model">The model<see cref="ForgotPasswordRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public Task ForgotPassword(ForgotPasswordRequest model)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The ResetPassword.
+        /// </summary>
+        /// <param name="model">The model<see cref="ResetPasswordRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task ResetPassword(ResetPasswordRequest model)
         {
             // validate
@@ -135,35 +173,64 @@ namespace goOfflineE.Services
             {
                 throw new AppException("User password reset error ", ex.InnerException);
             }
-
         }
 
+        /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{AccountResponse}}"/>.</returns>
         Task<IEnumerable<AccountResponse>> IAccountService.GetAll()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The GetById.
+        /// </summary>
+        /// <param name="id">The id<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{AccountResponse}"/>.</returns>
         public Task<AccountResponse> GetById(string id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The Create.
+        /// </summary>
+        /// <param name="model">The model<see cref="CreateRequest"/>.</param>
+        /// <returns>The <see cref="Task{AccountResponse}"/>.</returns>
         public async Task<AccountResponse> Create(CreateRequest model)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The Update.
+        /// </summary>
+        /// <param name="id">The id<see cref="string"/>.</param>
+        /// <param name="model">The model<see cref="UpdateRequest"/>.</param>
+        /// <returns>The <see cref="Task{AccountResponse}"/>.</returns>
         public Task<AccountResponse> Update(string id, UpdateRequest model)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="id">The id<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public Task Delete(string id)
         {
             throw new NotImplementedException();
         }
 
         // helper methods
+        /// <summary>
+        /// The GenerateToken.
+        /// </summary>
+        /// <param name="userId">The userId<see cref="string"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
         public string GenerateToken(string userId)
         {
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SettingConfigurations.IssuerToken));
