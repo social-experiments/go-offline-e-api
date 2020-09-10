@@ -6,8 +6,10 @@
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using Microsoft.WindowsAzure.Storage.Table;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -208,9 +210,9 @@
         /// The UpdateStatusToTrainStudentModel.
         /// </summary>
         /// <param name="studentId">The studentId<see cref="string"/>.</param>
-        /// <param name="blobURL">The blobURL<see cref="string"/>.</param>
+        /// <param name="studentPhotos">The studentPhotos<see cref="List{string}"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task UpdateStudentProfile(string studentId, string blobURL)
+        public async Task UpdateStudentProfile(string studentId, List<string> studentPhotos)
         {
             TableQuery<Entites.Student> query = new TableQuery<Entites.Student>()
                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, studentId));
@@ -218,10 +220,16 @@
             var student = studentQuery.SingleOrDefault();
             student.TrainStudentModel = true;
 
-            if (string.IsNullOrEmpty(student.ProfileStoragePath))
+            var existingPhotURLs = JsonConvert.DeserializeObject<StudentPhotos>(student.ProfileStoragePath);
+
+            if (existingPhotURLs != null)
             {
-                student.ProfileStoragePath = blobURL;
+                studentPhotos = studentPhotos.Union(existingPhotURLs.Photos).ToList();
             }
+
+            var studentPhotoBlobURLs = JsonConvert.SerializeObject(new StudentPhotos { Photos = studentPhotos });
+
+            student.ProfileStoragePath = studentPhotoBlobURLs;
 
             try
             {

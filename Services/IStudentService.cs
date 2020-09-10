@@ -30,6 +30,6 @@
         /// <param name="studentId">The studentId<see cref="string"/>.</param>
         /// <param name="blobURL">The blobURL<see cref="string"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        Task UpdateStudentProfile(string studentId, string blobURL);
+        Task UpdateStudentProfile(string studentId, List<string> studentPhotos);
     }
 }

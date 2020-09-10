@@ -105,7 +105,7 @@
 
                 // Train the PersonGroup
                 await _faceClient.PersonGroup.TrainAsync(queueDataMessage.SchoolId).ConfigureAwait(false);
-                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs[0]);
+                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs);
 
                 _log.LogInformation($"Train the PersonGroup Done {queueDataMessage.SchoolId}");
             }
