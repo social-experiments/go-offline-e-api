@@ -149,8 +149,8 @@
             var schoolData = this._mapper.Map<IEnumerable<Models.School>>(schools);
             foreach (var school in schoolData)
             {
-                school.ClassRooms = await _classService.GetAll(school.Id);
-                school.Teachers = await _teacherService.GetAll(school.Id);
+                school.ClassRooms = ( await _classService.GetAll(school.Id)).ToList();
+                school.Teachers = (await _teacherService.GetAll(school.Id)).ToList();
             }
             return schoolData;
         }
@@ -166,6 +166,12 @@
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, schoolId));
             var schoolQuery = await _tableStorage.QueryAsync<Entites.School>("School", query);
             return schoolQuery.SingleOrDefault();
+        }
+
+        public async Task<School> Get(string schoolId)
+        {
+            var school = await GetSchool(schoolId);
+            return this._mapper.Map<School>(school);
         }
     }
 }

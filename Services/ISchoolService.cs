@@ -24,6 +24,13 @@
         Task<IEnumerable<School>> GetAll(string schoolId = "");
 
         /// <summary>
+        /// The GetSchool.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{School}"/>.</returns>
+        Task<School> Get(string schoolId);
+
+        /// <summary>
         /// The Delete.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>

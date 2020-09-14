@@ -5,13 +5,37 @@
     /// <summary>
     /// Defines the <see cref="StudentRequest" />.
     /// </summary>
-    public class StudentRequest : UserRequest
+    public class StudentRequest
     {
         /// <summary>
         /// Gets or sets the SchoolId.
         /// </summary>
         [Required]
         public string SchoolId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Id.
+        /// </summary>
+        [Required]
+        public string Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the FirstName.
+        /// </summary>
+        [Required]
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LastName.
+        /// </summary>
+        [Required]
+        public string LastName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the EnrolmentNo.
+        /// </summary>
+        [Required]
+        public string EnrolmentNo { get; set; }
 
         /// <summary>
         /// Gets or sets the ClassId.
@@ -63,5 +87,10 @@
         /// Gets or sets the Longitude.
         /// </summary>
         public string Longitude { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CreatedBy.
+        /// </summary>
+        public string CreatedBy { get; set; }
     }
 }

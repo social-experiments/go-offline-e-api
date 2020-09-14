@@ -35,6 +35,16 @@
         private readonly ISchoolService _schoolService;
 
         /// <summary>
+        /// Defines the _studentService.
+        /// </summary>
+        private readonly IStudentService _studentService;
+
+        /// <summary>
+        /// Defines the _classService.
+        /// </summary>
+        private readonly IClassService _classService;
+
+        /// <summary>
         /// Defines the _mapper.
         /// </summary>
         private readonly IMapper _mapper;
@@ -45,11 +55,15 @@
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
         /// <param name="schoolService">The schoolService<see cref="ISchoolService"/>.</param>
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
-        public AccountService(ITableStorage tableStorage, ISchoolService schoolService, IMapper mapper)
+        /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
+        /// <param name="classService">The classService<see cref="IClassService"/>.</param>
+        public AccountService(ITableStorage tableStorage, ISchoolService schoolService, IMapper mapper, IStudentService studentService, IClassService classService)
         {
             _tableStorage = tableStorage;
             _schoolService = schoolService;
             _mapper = mapper;
+            _studentService = studentService;
+            _classService = classService;
         }
 
         /// <summary>
@@ -84,7 +98,7 @@
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Role = account.Role,
-                Schools = schools,
+                Schools = schools.ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
@@ -225,7 +239,6 @@
             throw new NotImplementedException();
         }
 
-        // helper methods
         /// <summary>
         /// The GenerateToken.
         /// </summary>
@@ -250,6 +263,71 @@
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        /// <summary>
+        /// The Authenticate.
+        /// </summary>
+        /// <param name="model">The model<see cref="StudentAuthenticateRequest"/>.</param>
+        /// <returns>The <see cref="Task{AuthenticateResponse}"/>.</returns>
+        public async Task<AuthenticateResponse> Authenticate(StudentAuthenticateRequest model)
+        {
+            // validate
+            var students = await _tableStorage.GetAllAsync<Student>("Student");
+            var student = students.SingleOrDefault(stud => stud.EnrolmentNo!=null && stud.EnrolmentNo.ToLower() == model.EnrolmentNo.ToLower());
+
+            if (student == null)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent(string.Format("Invalid Enrolment Number!"))
+                };
+                throw new HttpResponseException(resp);
+            }
+
+            // authentication successful so generate jwt
+            var jwtToken = GenerateToken(student.RowKey);
+
+            var studentRes = new StudentResponse
+            {
+                Id = student.RowKey,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                EnrolmentNo = student.EnrolmentNo,
+                Address1 = student.Address1,
+                Address2 = student.Address2,
+                Country = student.Country,
+                State = student.State,
+                City = student.City,
+                Zip = student.Zip,
+                SchoolId = student.PartitionKey,
+                ClassId = student.ClassId,
+                ProfileStoragePath = student.ProfileStoragePath,
+                TrainStudentModel = student.TrainStudentModel
+            };
+
+            var school = await _schoolService.Get(student.PartitionKey);
+
+            var classRoom = await _classService.Get(student.ClassId);
+
+            classRoom.Students.Add(studentRes);
+
+            school.ClassRooms.Add(classRoom);
+
+            var response = new AuthenticateResponse
+            {
+                Id = student.RowKey,
+                EnrolmentNo = student.EnrolmentNo,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Email = student.EnrolmentNo,
+                Role = Role.Student.ToString(),
+                Token = jwtToken
+            };
+
+            response.Schools.Add(school);
+
+            return response;
         }
     }
 }

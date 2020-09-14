@@ -11,4 +11,10 @@ namespace goOfflineE.Models
         [Required]
         public string Password { get; set; }
     }
+
+    public class StudentAuthenticateRequest
+    {
+        [Required]
+        public string EnrolmentNo { get; set; }
+    }
 }

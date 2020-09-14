@@ -23,6 +23,11 @@
         public string ClassId { get; set; }
 
         /// <summary>
+        /// Gets or sets the EnrolmentNo.
+        /// </summary>
+        public string EnrolmentNo { get; set; }
+
+        /// <summary>
         /// Gets or sets the FirstName.
         /// </summary>
         public string FirstName { get; set; }

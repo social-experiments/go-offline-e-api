@@ -24,8 +24,8 @@ namespace goOfflineE.Models
         public DateTime? SyncDateTime { get; set; }
 
         public string CreatedBy { get; set; }
-        public IEnumerable<ClassRoom> ClassRooms { get; set; }
-        public IEnumerable<TeacherResponse> Teachers { get; set; }
+        public List<ClassRoom> ClassRooms { get; set; }
+        public List<TeacherResponse> Teachers { get; set; }
 
 
     }

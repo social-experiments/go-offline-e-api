@@ -28,7 +28,7 @@
         /// The UpdateStatusToTrainStudentModel.
         /// </summary>
         /// <param name="studentId">The studentId<see cref="string"/>.</param>
-        /// <param name="blobURL">The blobURL<see cref="string"/>.</param>
+        /// <param name="studentPhotos">The studentPhotos<see cref="List{string}"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task UpdateStudentProfile(string studentId, List<string> studentPhotos);
     }

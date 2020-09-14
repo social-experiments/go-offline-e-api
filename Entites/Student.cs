@@ -26,6 +26,21 @@
         }
 
         /// <summary>
+        /// Gets or sets the FirstName.
+        /// </summary>
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the LastName.
+        /// </summary>
+        public string LastName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the EnrolmentNo.
+        /// </summary>
+        public string EnrolmentNo { get; set; }
+
+        /// <summary>
         /// Gets or sets the Gender.
         /// </summary>
         public string Gender { get; set; }

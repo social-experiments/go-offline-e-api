@@ -101,6 +101,27 @@
         }
 
         /// <summary>
+        /// The Get.
+        /// </summary>
+        /// <param name="classRoomId">The classRoomId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{ClassRoom}"/>.</returns>
+        public async Task<ClassRoom> Get(string classRoomId)
+        {
+            TableQuery<Entites.ClassRoom> classQuery = new TableQuery<Entites.ClassRoom>()
+                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, classRoomId));
+            var classRoomQuery = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", classQuery);
+            var classRoom = classRoomQuery.FirstOrDefault();
+
+            return new ClassRoom
+            {
+                ClassId = classRoom.RowKey,
+                SchoolId = classRoom.PartitionKey,
+                ClassRoomName = classRoom.ClassRoomName,
+                ClassDivision = classRoom.ClassDivision
+            };
+        }
+
+        /// <summary>
         /// The GetAll.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
