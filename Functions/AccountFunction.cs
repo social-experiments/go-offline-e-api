@@ -35,6 +35,19 @@ namespace goOfflineE.Functions
             return new OkObjectResult(response);
         }
 
+        [FunctionName("AccountStudentLogin")]
+        public async Task<IActionResult> StudentLogin(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "login/student")]
+            [RequestBodyType(typeof(StudentAuthenticateRequest), "User authentication request")] HttpRequest request)
+        {
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            StudentAuthenticateRequest requestData = JsonConvert.DeserializeObject<StudentAuthenticateRequest>(requestBody);
+
+            var response = await _accountService.Authenticate(requestData);
+
+            return new OkObjectResult(response);
+        }
+
 
         [FunctionName("AccountResetPassword")]
         public async Task<IActionResult> ResetPassword(

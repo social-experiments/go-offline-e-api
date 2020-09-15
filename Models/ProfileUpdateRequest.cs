@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using goOfflineE.Entites;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace goOfflineE.Models
 {
@@ -21,6 +23,9 @@ namespace goOfflineE.Models
 
         [JsonProperty("confirmedPassword")]
         public string ConfirmPassword { get; set; }
+
+        [EnumDataType(typeof(Role))]
+        public string Role { get; set; }
     }
 }
 

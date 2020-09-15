@@ -1,32 +1,58 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using goOfflineE.Entites;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.Azure.CognitiveServices.Vision.Face;
-using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using Aducati.Azure.TableStorage.Repository;
+    using goOfflineE.Entites;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using Microsoft.Azure.CognitiveServices.Vision.Face;
+    using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
+
+    /// <summary>
+    /// Defines the <see cref="CognitiveService" />.
+    /// </summary>
     public class CognitiveService : ICognitiveService
     {
+        /// <summary>
+        /// Defines the _faceClient.
+        /// </summary>
         private readonly IFaceClient _faceClient;
+
+        /// <summary>
+        /// Defines the _azureBlobService.
+        /// </summary>
         private readonly IAzureBlobService _azureBlobService;
+
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
 
-        public CognitiveService(IFaceClient faceClient, IAzureBlobService azureBlobService, ITableStorage tableStorage)
+        /// <summary>
+        /// Defines the _studentService.
+        /// </summary>
+        private readonly IStudentService _studentService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CognitiveService"/> class.
+        /// </summary>
+        /// <param name="faceClient">The faceClient<see cref="IFaceClient"/>.</param>
+        /// <param name="azureBlobService">The azureBlobService<see cref="IAzureBlobService"/>.</param>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
+        public CognitiveService(IFaceClient faceClient, IAzureBlobService azureBlobService, ITableStorage tableStorage, IStudentService studentService)
         {
             _faceClient = faceClient;
             _azureBlobService = azureBlobService;
             _tableStorage = tableStorage;
+            _studentService = studentService;
 
             if (Uri.IsWellFormedUriString(SettingConfigurations.CognitiveServiceEndPoint, UriKind.Absolute))
             {
@@ -34,6 +60,12 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The TrainStudentModel.
+        /// </summary>
+        /// <param name="queueDataMessage">The queueDataMessage<see cref="QueueDataMessage"/>.</param>
+        /// <param name="_log">The _log<see cref="ILogger"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task TrainStudentModel(QueueDataMessage queueDataMessage, ILogger _log)
         {
             //Create school group
@@ -56,7 +88,6 @@ namespace goOfflineE.Services
 
                 _log.LogInformation($"BlobStorageRequest {blobStorage.StorageUri}");
 
-
                 foreach (var blobUri in queueDataMessage.PictureURLs)
                 {
                     var blobUriBuilder = new System.UriBuilder($"{blobStorage.StorageUri}students/{blobUri}")
@@ -74,9 +105,9 @@ namespace goOfflineE.Services
 
                 // Train the PersonGroup
                 await _faceClient.PersonGroup.TrainAsync(queueDataMessage.SchoolId).ConfigureAwait(false);
+                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs);
+
                 _log.LogInformation($"Train the PersonGroup Done {queueDataMessage.SchoolId}");
-
-
             }
             // Catch and display Face API errors.
             catch (APIErrorException ex)
@@ -90,10 +121,14 @@ namespace goOfflineE.Services
                 _log.LogInformation($"TrainStudentModel Exception: {ex}");
                 throw new AppException("Train Student Cognitive Service Error: ", ex.InnerException);
             }
-
         }
 
-        // Uploads the image file and calls DetectWithUrlAsync.
+        /// <summary>
+        /// The ProcessAttendance.
+        /// </summary>
+        /// <param name="queueDataMessage">The queueDataMessage<see cref="QueueDataMessage"/>.</param>
+        /// <param name="_log">The _log<see cref="ILogger"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task ProcessAttendance(QueueDataMessage queueDataMessage, ILogger _log)
         {
 
@@ -128,6 +163,8 @@ namespace goOfflineE.Services
 
                 _log.LogInformation($"End results");
 
+                IList<string> presentStudetns = new List<string>();
+
                 foreach (var identifyResult in results)
                 {
                     _log.LogInformation($"identifyResult = {identifyResult}");
@@ -135,7 +172,6 @@ namespace goOfflineE.Services
                     if (identifyResult.Candidates.Count() == 0)
                     {
                         _log.LogInformation($"No one identified");
-
                     }
                     else
                     {
@@ -148,25 +184,33 @@ namespace goOfflineE.Services
                         _log.LogInformation($"Identified as: {person.Name}");
 
                         var studentId = person.Name;
-                        var attaintance = new Attentdance(queueDataMessage.SchoolId, Guid.NewGuid().ToString())
-                        {
-                            StudentId = studentId,
-                            ClassRoomId = queueDataMessage.ClassId,
-                            TeacherId = queueDataMessage.TeacherId,
-                            CreatedBy = queueDataMessage.TeacherId,
-                            UpdatedBy = queueDataMessage.TeacherId,
-                            UpdatedOn = DateTime.UtcNow,
-                            Timestamp = queueDataMessage.PictureTimestamp,
-                            Latitude = queueDataMessage.Latitude,
-                            Longitude = queueDataMessage.Longitude,
-                            Present = true
-                        };
-                        _log.LogInformation($"Attentdance AddAsync: {attaintance}");
+                        presentStudetns.Add(studentId);
 
-                        await _tableStorage.AddAsync("Attentdance", attaintance);
-
-                       _log.LogInformation($" Done Attentdance AddAsync: {attaintance}");
                     }
+                }
+
+                var allStudents = await _studentService.GetAll(queueDataMessage.SchoolId, queueDataMessage.ClassId);
+
+                foreach (var student in allStudents)
+                {
+                    var attaintance = new Attentdance(queueDataMessage.SchoolId, Guid.NewGuid().ToString())
+                    {
+                        StudentId = student.Id,
+                        ClassRoomId = queueDataMessage.ClassId,
+                        TeacherId = queueDataMessage.TeacherId,
+                        CreatedBy = queueDataMessage.TeacherId,
+                        UpdatedBy = queueDataMessage.TeacherId,
+                        UpdatedOn = DateTime.UtcNow,
+                        Timestamp = queueDataMessage.PictureTimestamp,
+                        Latitude = queueDataMessage.Latitude,
+                        Longitude = queueDataMessage.Longitude,
+                        Present = presentStudetns.Contains(student.Id)
+                    };
+                    _log.LogInformation($"Attentdance AddAsync: {attaintance}");
+
+                    await _tableStorage.AddAsync("Attentdance", attaintance);
+
+                    _log.LogInformation($" Done Attentdance AddAsync: {attaintance}");
                 }
             }
             // Catch and display Face API errors.
@@ -185,6 +229,12 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The GetPictureData.
+        /// </summary>
+        /// <param name="jsonBlob">The jsonBlob<see cref="Stream"/>.</param>
+        /// <param name="log">The log<see cref="ILogger"/>.</param>
+        /// <returns>The <see cref="QueueDataMessage"/>.</returns>
         private QueueDataMessage GetPictureData(Stream jsonBlob, ILogger log)
         {
             QueueDataMessage result = new QueueDataMessage();
@@ -201,6 +251,11 @@ namespace goOfflineE.Services
             return result;
         }
 
+        /// <summary>
+        /// The CreateGroup.
+        /// </summary>
+        /// <param name="personGroupId">The personGroupId<see cref="string"/>.</param>
+        /// <param name="_log">The _log<see cref="ILogger"/>.</param>
         private void CreateGroup(string personGroupId, ILogger _log)
         {
             try
@@ -213,7 +268,6 @@ namespace goOfflineE.Services
             {
                 _log.LogInformation($"Already Created : {personGroupId}");
             }
-
         }
     }
 }

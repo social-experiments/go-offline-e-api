@@ -28,30 +28,18 @@ namespace goOfflineE.Functions
         [FunctionName("QueueMessage")]
         public async Task<IActionResult> QueueMessage(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "queue/message")]
-            [RequestBodyType(typeof(QueueDataMessage), "Queue Message")] HttpRequest request)
+            [RequestBodyType(typeof(QueueDataMessage), "Queue Message")] HttpRequest request, ILogger log)
         {
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
             QueueDataMessage requestData = JsonConvert.DeserializeObject<QueueDataMessage>(requestBody);
-
             requestData.QueueCreateTime = DateTime.UtcNow;
 
-            // Parse the connection string   
-            // Return a reference to the storage account.  
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
-
-            // Create the queue client.  
             CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-
-            // Retrieve queue reference from the container  
             CloudQueue queue = queueClient.GetQueueReference("queue-message");
 
-            // Create queue if it does not exist  
             await queue.CreateIfNotExistsAsync();
-
-            //Create message   
             CloudQueueMessage message = new CloudQueueMessage(JsonConvert.SerializeObject(requestData));
-
-            //Add message to queue  
             await queue.AddMessageAsync(message);
 
             return new OkObjectResult(new { message = "Queueed message successful." });
@@ -59,6 +47,17 @@ namespace goOfflineE.Functions
 
         [FunctionName("ProcessQueueMessage")]
         public void ProcessQueueMessage([QueueTrigger("queue-message", Connection = "AzureWebJobsStorage")] string queueMessage, ILogger log)
+        {
+            ProcessQueue(queueMessage, log);
+        }
+
+        [FunctionName("ProcessPoisonQueueMessage")]
+        public void ProcessPoisonQueueMessage([QueueTrigger("queue-message-poison", Connection = "AzureWebJobsStorage")] string queueMessage, ILogger log)
+        {
+            ProcessQueue(queueMessage, log);
+        }
+
+        private void ProcessQueue(string queueMessage, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {queueMessage}");
 
@@ -75,6 +74,7 @@ namespace goOfflineE.Functions
             }
 
             log.LogInformation($"End processing cognitive services.");
+
         }
     }
 }
