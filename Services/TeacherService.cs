@@ -47,6 +47,7 @@ namespace goOfflineE.Services
                 await _profileService.UpdateProfile(profileUpdateRequest);
 
                 //Update teacher information
+                teacher.Gender = model.Gender;
                 teacher.Address1 = model.Address1;
                 teacher.Address2 = model.Address2;
                 teacher.Country = model.Country;
@@ -98,6 +99,7 @@ namespace goOfflineE.Services
                     Latitude = model.Latitude,
                     Longitude = model.Longitude,
                     Active = true,
+                    Gender = model.Gender,
                     CreatedBy = model.CreatedBy,
                     UpdatedOn = DateTime.UtcNow,
                     UpdatedBy = model.CreatedBy,
@@ -142,6 +144,7 @@ namespace goOfflineE.Services
                                    State = teacher.State,
                                    City = teacher.City,
                                    Zip = teacher.Zip,
+                                   Gender = teacher.Gender,
                                    SchoolId = teacher.PartitionKey
                                };
 

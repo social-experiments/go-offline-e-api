@@ -32,6 +32,12 @@
         public string LastName { get; set; }
 
         /// <summary>
+        /// Gets or sets the Gender.
+        /// </summary>
+        [Required]
+        public string Gender { get; set; }
+
+        /// <summary>
         /// Gets or sets the EnrolmentNo.
         /// </summary>
         [Required]
