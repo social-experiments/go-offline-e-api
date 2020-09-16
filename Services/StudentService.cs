@@ -186,10 +186,10 @@
             var student = studentQuery.SingleOrDefault();
             student.TrainStudentModel = true;
 
-            var existingPhotURLs = JsonConvert.DeserializeObject<StudentPhotos>(student.ProfileStoragePath);
 
-            if (existingPhotURLs != null)
+            if (student.ProfileStoragePath != null)
             {
+                var existingPhotURLs = JsonConvert.DeserializeObject<StudentPhotos>(student.ProfileStoragePath);
                 studentPhotos = studentPhotos.Union(existingPhotURLs.Photos).ToList();
             }
 
