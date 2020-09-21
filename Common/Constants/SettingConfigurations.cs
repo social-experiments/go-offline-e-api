@@ -23,7 +23,6 @@
         /// </summary>
         public static string Issuer => Environment.GetEnvironmentVariable("ISSUER");
 
-        //Email configurations
         /// <summary>
         /// Gets the SMTPServer.
         /// </summary>
@@ -44,7 +43,6 @@
         /// </summary>
         public static string SMTPPassword => Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
-        //Azure storage
         /// <summary>
         /// Gets the AzureWebJobsStorage.
         /// </summary>
@@ -55,7 +53,6 @@
         /// </summary>
         public static string AccountKey => Environment.GetEnvironmentVariable("AccountKey");
 
-        //Cognitive service
         /// <summary>
         /// Gets the CognitiveServiceKey.
         /// </summary>
@@ -65,6 +62,11 @@
         /// Gets the CognitiveServiceEndPoint.
         /// </summary>
         public static string CognitiveServiceEndPoint => Environment.GetEnvironmentVariable("CognitiveServiceEndPoint");
+
+        /// <summary>
+        /// Gets the WebSiteUrl.
+        /// </summary>
+        public static string WebSiteUrl => Environment.GetEnvironmentVariable("WEB_SITE");
 
         /// <summary>
         /// The GetRandomPassword.

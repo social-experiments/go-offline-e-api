@@ -8,8 +8,9 @@
     "AUDIENCE": "goOfflineE",
     "ISSUER": "SocialExperiments",
 
-    "SMTP_USER": "zcondigitalschool@gmail.com",
-    "SMTP_PASSWORD": "zcpl@123",
+    "WEB_SITE": "https://goofflinee.web.app/",
+    "SMTP_USER": "socialexpsindia@gmail.com",
+    "SMTP_PASSWORD": "S0ciale*9s",
     "SMTP_SERVER": "smtp.gmail.com",
     "SMTP_PORT": "465",
 
