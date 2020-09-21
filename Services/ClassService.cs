@@ -1,14 +1,16 @@
 ﻿namespace goOfflineE.Services
 {
     using Aducati.Azure.TableStorage.Repository;
-    using AutoMapper;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
+    using System.Web.Http;
 
     /// <summary>
     /// Defines the <see cref="ClassService" />.
@@ -21,11 +23,6 @@
         private readonly ITableStorage _tableStorage;
 
         /// <summary>
-        /// Defines the _mapper.
-        /// </summary>
-        private readonly IMapper _mapper;
-
-        /// <summary>
         /// Defines the _studentService.
         /// </summary>
         private readonly IStudentService _studentService;
@@ -34,12 +31,10 @@
         /// Initializes a new instance of the <see cref="ClassService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
-        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
-        public ClassService(ITableStorage tableStorage, IMapper mapper, IStudentService studentService)
+        public ClassService(ITableStorage tableStorage, IStudentService studentService)
         {
             _tableStorage = tableStorage;
-            _mapper = mapper;
             _studentService = studentService;
         }
 
@@ -50,10 +45,28 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateUpdate(ClassRoom model)
         {
-            TableQuery<Entites.ClassRoom> query = new TableQuery<Entites.ClassRoom>()
-                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, model.ClassId));
-            var classQuery = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", query);
-            var classRoom = classQuery.SingleOrDefault();
+            var classRooms = await _tableStorage.GetAllAsync<Entites.ClassRoom>("ClassRoom");
+            var classRoom = classRooms.SingleOrDefault(user => user.RowKey == model.ClassId);
+
+            // Validate class room availabilty
+            if (!String.IsNullOrEmpty(model.ClassRoomName))
+            {
+                var isClassAvailable = classRooms.Any(
+                    cls => cls.PartitionKey == model.SchoolId &&
+                cls.ClassRoomName.ToLower() == model.ClassRoomName.ToLower() &&
+                cls.ClassDivision.ToLower() == model.ClassDivision.ToLower()
+                );
+                if (isClassAvailable)
+                {
+                    var resp = new HttpResponseMessage(HttpStatusCode.Conflict)
+                    {
+                        Content = new StringContent(string.Format($"Class is not available in ${ model.SchoolId } school.")),
+
+                    };
+                    throw new HttpResponseException(resp);
+                }
+
+            }
 
             if (classRoom != null)
             {
@@ -76,6 +89,7 @@
             }
             else
             {
+
                 // Register new class
                 var classRoomId = String.IsNullOrEmpty(model.ClassId) ? Guid.NewGuid().ToString() : model.ClassId;
 
