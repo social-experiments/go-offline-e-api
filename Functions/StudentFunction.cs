@@ -1,26 +1,43 @@
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using goOfflineE.Helpers.Attributes;
-using goOfflineE.Models;
-using goOfflineE.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Newtonsoft.Json;
-using NSwag.Annotations;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace goOfflineE.Functions
 {
+    using AzureFunctions.Extensions.Swashbuckle.Attribute;
+    using goOfflineE.Helpers.Attributes;
+    using goOfflineE.Models;
+    using goOfflineE.Services;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Azure.WebJobs.Extensions.Http;
+    using Newtonsoft.Json;
+    using NSwag.Annotations;
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="StudentFunction" />.
+    /// </summary>
     public class StudentFunction : AuthenticationFilter
     {
+        /// <summary>
+        /// Defines the _studentService.
+        /// </summary>
         private readonly IStudentService _studentService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StudentFunction"/> class.
+        /// </summary>
+        /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
         public StudentFunction(IStudentService studentService)
         {
             _studentService = studentService;
         }
+
+        /// <summary>
+        /// The Register.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("StudentCreateUpdate")]
         [OpenApiOperation("Create/Update", "Student")]
         public async Task<IActionResult> Register(
@@ -41,6 +58,13 @@ namespace goOfflineE.Functions
             return new OkObjectResult(new { message = "Create/update student successful." });
         }
 
+        /// <summary>
+        /// The StudentList.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("StudentList")]
         [OpenApiOperation("List", "Student")]
         //[QueryStringParameter("schoolId", "School id", DataType = typeof(string), Required = true)]

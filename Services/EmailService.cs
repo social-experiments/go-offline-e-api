@@ -1,14 +1,23 @@
-﻿using goOfflineE.Helpers;
-using goOfflineE.Models;
-using MailKit.Net.Smtp;
-using MimeKit;
-using System;
-using System.Threading.Tasks;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using MailKit.Net.Smtp;
+    using MimeKit;
+    using System;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="EmailService" />.
+    /// </summary>
     public class EmailService : IEmailService
     {
+        /// <summary>
+        /// The SendAsync.
+        /// </summary>
+        /// <param name="emailRequest">The emailRequest<see cref="EmailRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task SendAsync(EmailRequest emailRequest)
         {
             Message message = new Message(emailRequest);
@@ -17,6 +26,11 @@ namespace goOfflineE.Services
             await SendAsync(emailMessage);
         }
 
+        /// <summary>
+        /// The SendAsync.
+        /// </summary>
+        /// <param name="mailMessage">The mailMessage<see cref="MimeMessage"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task SendAsync(MimeMessage mailMessage)
         {
             using (var client = new SmtpClient())
@@ -42,6 +56,11 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The CreateEmailMessage.
+        /// </summary>
+        /// <param name="message">The message<see cref="Message"/>.</param>
+        /// <returns>The <see cref="MimeMessage"/>.</returns>
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();

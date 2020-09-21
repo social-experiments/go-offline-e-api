@@ -1,9 +1,10 @@
 ﻿namespace goOfflineE.Services
 {
-    using Aducati.Azure.TableStorage.Repository;
+    using goOfflineE.Common.Constants;
     using goOfflineE.Entites;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
+    using goOfflineE.Repository;
     using Microsoft.Azure.CognitiveServices.Vision.Face;
     using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
     using Microsoft.Extensions.Logging;

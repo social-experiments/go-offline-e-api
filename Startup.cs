@@ -1,24 +1,29 @@
-﻿
-using Aducati.Azure.TableStorage.Repository;
-using AutoMapper;
-using AzureFunctions.Extensions.Swashbuckle;
-using goOfflineE;
-using goOfflineE.Helpers;
-using goOfflineE.Services;
-using Microsoft.Azure.CognitiveServices.Vision.Face;
+﻿using goOfflineE;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace goOfflineE
 {
-    // <summary>
-    // Runs when the Azure Functions host starts.
-    // </summary>
+    using AutoMapper;
+    using AzureFunctions.Extensions.Swashbuckle;
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Helpers;
+    using goOfflineE.Repository;
+    using goOfflineE.Services;
+    using Microsoft.Azure.CognitiveServices.Vision.Face;
+    using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
+    using System.Reflection;
+
+    /// <summary>
+    /// Defines the <see cref="Startup" />.
+    /// </summary>
     public class Startup : FunctionsStartup
     {
+        /// <summary>
+        /// The Configure.
+        /// </summary>
+        /// <param name="builder">The builder<see cref="IFunctionsHostBuilder"/>.</param>
         public override void Configure(IFunctionsHostBuilder builder)
         {
 
@@ -34,6 +39,10 @@ namespace goOfflineE
             ConfigureServices(builder.Services);
         }
 
+        /// <summary>
+        /// The ConfigureServices.
+        /// </summary>
+        /// <param name="services">The services<see cref="IServiceCollection"/>.</param>
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(typeof(Startup));
@@ -51,8 +60,6 @@ namespace goOfflineE
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
             services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),
             new System.Net.Http.DelegatingHandler[] { }));
-
         }
     }
-
 }

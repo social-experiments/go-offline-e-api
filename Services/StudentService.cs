@@ -1,9 +1,9 @@
 ﻿namespace goOfflineE.Services
 {
-    using Aducati.Azure.TableStorage.Repository;
     using AutoMapper;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
+    using goOfflineE.Repository;
     using Microsoft.WindowsAzure.Storage.Table;
     using Newtonsoft.Json;
     using System;

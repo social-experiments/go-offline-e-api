@@ -1,10 +1,12 @@
 ﻿namespace goOfflineE.Services
 {
-    using Aducati.Azure.TableStorage.Repository;
     using AutoMapper;
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Common.Enums;
     using goOfflineE.Entites;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
+    using goOfflineE.Repository;
     using Microsoft.IdentityModel.Tokens;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
@@ -274,7 +276,7 @@
         {
             // validate
             var students = await _tableStorage.GetAllAsync<Student>("Student");
-            var student = students.SingleOrDefault(stud => stud.EnrolmentNo!=null && stud.EnrolmentNo.ToLower() == model.EnrolmentNo.ToLower());
+            var student = students.SingleOrDefault(stud => stud.EnrolmentNo != null && stud.EnrolmentNo.ToLower() == model.EnrolmentNo.ToLower());
 
             if (student == null)
             {

@@ -1,32 +1,41 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using goOfflineE.Entites;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http;
-using BC = BCrypt.Net.BCrypt;
-
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Entites;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using goOfflineE.Repository;
+    using System;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+    using BC = BCrypt.Net.BCrypt;
+
+    /// <summary>
+    /// Defines the <see cref="ProfileService" />.
+    /// </summary>
     public class ProfileService : IProfileService
     {
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileService"/> class.
+        /// </summary>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
         public ProfileService(ITableStorage tableStorage)
         {
             _tableStorage = tableStorage;
         }
 
         /// <summary>
-        /// Update user profile
+        /// Update user profile.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="model">.</param>
+        /// <returns>.</returns>
         public async Task UpdateProfile(ProfileUpdateRequest model)
         {
             var users = await _tableStorage.GetAllAsync<User>("User");
@@ -98,6 +107,11 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The Register.
+        /// </summary>
+        /// <param name="model">The model<see cref="RegisterRequest"/>.</param>
+        /// <returns>The <see cref="Task{object}"/>.</returns>
         public async Task<object> Register(RegisterRequest model)
         {
             // validate

@@ -2,6 +2,7 @@
 {
     using Azure.Storage;
     using Azure.Storage.Sas;
+    using goOfflineE.Common.Constants;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using Microsoft.WindowsAzure.Storage;
