@@ -303,7 +303,8 @@
                 SchoolId = student.PartitionKey,
                 ClassId = student.ClassId,
                 ProfileStoragePath = student.ProfileStoragePath,
-                TrainStudentModel = student.TrainStudentModel
+                TrainStudentModel = student.TrainStudentModel,
+                Gender = student.Gender
             };
 
             var school = await _schoolService.Get(student.PartitionKey);

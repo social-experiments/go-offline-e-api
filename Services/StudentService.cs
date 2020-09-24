@@ -69,7 +69,8 @@
                 //Update student information
                 student.EnrolmentNo = model.EnrolmentNo;
                 student.FirstName = model.FirstName;
-                student.LastName = student.LastName;
+                student.LastName = model.LastName;
+                student.Gender = model.Gender;
                 student.ClassId = model.ClassId;
                 student.Address1 = model.Address1;
                 student.Address2 = model.Address2;
@@ -102,6 +103,7 @@
                     EnrolmentNo = model.EnrolmentNo,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
+                    Gender = model.Gender,
                     ClassId = model.ClassId,
                     Address1 = model.Address1,
                     Address2 = model.Address2,
@@ -165,6 +167,7 @@
                                   Zip = student.Zip,
                                   SchoolId = student.PartitionKey,
                                   ClassId = student.ClassId,
+                                  Gender = student.Gender,
                                   ProfileStoragePath = student.ProfileStoragePath,
                                   TrainStudentModel = student.TrainStudentModel
                               };
@@ -186,10 +189,10 @@
             var student = studentQuery.SingleOrDefault();
             student.TrainStudentModel = true;
 
-            var existingPhotURLs = JsonConvert.DeserializeObject<StudentPhotos>(student.ProfileStoragePath);
 
-            if (existingPhotURLs != null)
+            if (student.ProfileStoragePath != null)
             {
+                var existingPhotURLs = JsonConvert.DeserializeObject<StudentPhotos>(student.ProfileStoragePath);
                 studentPhotos = studentPhotos.Union(existingPhotURLs.Photos).ToList();
             }
 

@@ -38,6 +38,11 @@
         public string LastName { get; set; }
 
         /// <summary>
+        /// Gets or sets the Gender.
+        /// </summary>
+        public string Gender { get; set; }
+
+        /// <summary>
         /// Gets or sets the Email.
         /// </summary>
         [EmailAddress]

@@ -11,6 +11,7 @@ using NSwag.Annotations;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace goOfflineE.Functions
 {
@@ -36,11 +37,19 @@ namespace goOfflineE.Functions
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
             ClassRoom requestData = JsonConvert.DeserializeObject<ClassRoom>(requestBody);
 
-            await _classService.CreateUpdate(requestData);
+            try
+            {
+                await _classService.CreateUpdate(requestData);
 
+            }
+            catch (HttpResponseException ex)
+            {
+                return new  ConflictObjectResult(ex.Response.Content);
+
+            }
             return new OkObjectResult(new { message = "Create/update class successful." });
         }
-
+         
         [FunctionName("ClassRoomList")]
         [OpenApiOperation("List", "ClassRoom")]
         [QueryStringParameter("id", "School id", DataType = typeof(string), Required = true)]
