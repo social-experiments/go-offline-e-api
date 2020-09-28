@@ -51,6 +51,8 @@
         /// </summary>
         private readonly IMapper _mapper;
 
+         private readonly IContentService _contentService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
@@ -59,13 +61,19 @@
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
         /// <param name="classService">The classService<see cref="IClassService"/>.</param>
-        public AccountService(ITableStorage tableStorage, ISchoolService schoolService, IMapper mapper, IStudentService studentService, IClassService classService)
+        public AccountService(ITableStorage tableStorage, 
+            ISchoolService schoolService, 
+            IMapper mapper, 
+            IStudentService studentService, 
+            IClassService classService,
+            IContentService contentService)
         {
             _tableStorage = tableStorage;
             _schoolService = schoolService;
             _mapper = mapper;
             _studentService = studentService;
             _classService = classService;
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -92,6 +100,7 @@
             var jwtToken = GenerateToken(account.RowKey);
 
             var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
+            var courseContent = await _contentService.GetAll();
 
             var response = new AuthenticateResponse
             {
@@ -101,6 +110,7 @@
                 LastName = account.LastName,
                 Role = account.Role,
                 Schools = schools.ToList(),
+                CourseContent = courseContent.ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
@@ -215,7 +225,7 @@
         /// </summary>
         /// <param name="model">The model<see cref="CreateRequest"/>.</param>
         /// <returns>The <see cref="Task{AccountResponse}"/>.</returns>
-        public async Task<AccountResponse> Create(CreateRequest model)
+        public  Task<AccountResponse> Create(CreateRequest model)
         {
             throw new NotImplementedException();
         }
@@ -309,8 +319,8 @@
                 Gender = student.Gender
             };
 
+            var courseContent = await _contentService.GetAll(student.PartitionKey, student.ClassId);
             var school = await _schoolService.Get(student.PartitionKey);
-
             var classRoom = await _classService.Get(student.ClassId);
 
             classRoom.Students.Add(studentRes);
@@ -325,6 +335,7 @@
                 LastName = student.LastName,
                 Email = student.EnrolmentNo,
                 Role = Role.Student.ToString(),
+                CourseContent = courseContent.ToList(),
                 Token = jwtToken
             };
 

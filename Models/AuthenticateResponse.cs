@@ -13,6 +13,7 @@ namespace goOfflineE.Models
         public AuthenticateResponse()
         {
             this.Schools = new List<School>();
+            this.CourseContent = new List<Content>();
         }
 
         /// <summary>
@@ -24,6 +25,10 @@ namespace goOfflineE.Models
         /// Gets or sets the Schools.
         /// </summary>
         public List<School> Schools { get; set; }
+
+
+        public List<Content> CourseContent { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the FirstName.
