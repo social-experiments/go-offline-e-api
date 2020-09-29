@@ -1,11 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-
-namespace goOfflineE.Helpers
+﻿namespace goOfflineE.Helpers
 {
+    using goOfflineE.Common.Constants;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OpenApi.Models;
+    using Swashbuckle.AspNetCore.SwaggerGen;
+
+    /// <summary>
+    /// Defines the <see cref="SwaggerUIConfigurations" />.
+    /// </summary>
     public class SwaggerUIConfigurations
     {
+        /// <summary>
+        /// The SwaggerUIConfig.
+        /// </summary>
+        /// <param name="swaggerGenOption">The swaggerGenOption<see cref="SwaggerGenOptions"/>.</param>
         public static void SwaggerUIConfig(SwaggerGenOptions swaggerGenOption)
         {
 

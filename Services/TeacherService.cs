@@ -1,23 +1,49 @@
-﻿using Aducati.Azure.TableStorage.Repository;
-using AutoMapper;
-using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using AutoMapper;
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Helpers;
+    using goOfflineE.Models;
+    using goOfflineE.Repository;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="TeacherService" />.
+    /// </summary>
     public class TeacherService : ITeacherService
     {
+        /// <summary>
+        /// Defines the _tableStorage.
+        /// </summary>
         private readonly ITableStorage _tableStorage;
+
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Defines the _profileService.
+        /// </summary>
         private readonly IProfileService _profileService;
+
+        /// <summary>
+        /// Defines the _emailService.
+        /// </summary>
         private readonly IEmailService _emailService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TeacherService"/> class.
+        /// </summary>
+        /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
+        /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
+        /// <param name="profileService">The profileService<see cref="IProfileService"/>.</param>
         public TeacherService(IEmailService emailService, ITableStorage tableStorage, IMapper mapper, IProfileService profileService)
         {
             _tableStorage = tableStorage;
@@ -25,6 +51,12 @@ namespace goOfflineE.Services
             _profileService = profileService;
             _emailService = emailService;
         }
+
+        /// <summary>
+        /// The CreateUpdate.
+        /// </summary>
+        /// <param name="model">The model<see cref="TeacherRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateUpdate(TeacherRequest model)
         {
 
@@ -116,9 +148,13 @@ namespace goOfflineE.Services
                     throw new AppException("Create teacher error: ", ex.InnerException);
                 }
             }
-
         }
 
+        /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{TeacherResponse}}"/>.</returns>
         public async Task<IEnumerable<TeacherResponse>> GetAll(string schoolId)
         {
             TableQuery<Entites.User> userQuery = new TableQuery<Entites.User>()
@@ -151,6 +187,11 @@ namespace goOfflineE.Services
             return teachersList;
         }
 
+        /// <summary>
+        /// The NewTeacherNotificationEmail.
+        /// </summary>
+        /// <param name="registerRequest">The registerRequest<see cref="RegisterRequest"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task NewTeacherNotificationEmail(RegisterRequest registerRequest)
         {
             StringBuilder emailBody = new StringBuilder();

@@ -1,27 +1,43 @@
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
-using goOfflineE.Helpers.Attributes;
-using goOfflineE.Models;
-using goOfflineE.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-
 namespace goOfflineE.Functions
 {
+    using AzureFunctions.Extensions.Swashbuckle.Attribute;
+    using goOfflineE.Helpers.Attributes;
+    using goOfflineE.Models;
+    using goOfflineE.Services;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Azure.WebJobs.Extensions.Http;
+    using Newtonsoft.Json;
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="AccountFunction" />.
+    /// </summary>
     public class AccountFunction : AuthenticationFilter
     {
+        /// <summary>
+        /// Defines the _accountService.
+        /// </summary>
         private readonly IAccountService _accountService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountFunction"/> class.
+        /// </summary>
+        /// <param name="accountService">The accountService<see cref="IAccountService"/>.</param>
         public AccountFunction(IAccountService accountService)
         {
             _accountService = accountService;
         }
 
+        /// <summary>
+        /// The Login.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AccountLogin")]
         public async Task<IActionResult> Login(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "login")]
@@ -35,6 +51,11 @@ namespace goOfflineE.Functions
             return new OkObjectResult(response);
         }
 
+        /// <summary>
+        /// The StudentLogin.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AccountStudentLogin")]
         public async Task<IActionResult> StudentLogin(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "login/student")]
@@ -48,7 +69,11 @@ namespace goOfflineE.Functions
             return new OkObjectResult(response);
         }
 
-
+        /// <summary>
+        /// The ResetPassword.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AccountResetPassword")]
         public async Task<IActionResult> ResetPassword(
            [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "reset/password")]
@@ -67,6 +92,12 @@ namespace goOfflineE.Functions
             return new OkObjectResult(new { message = "Reset password successfully." });
         }
 
+        /// <summary>
+        /// The VerifyEmail.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="emailId">The emailId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AccountVerifyEmail")]
         public async Task<IActionResult> VerifyEmail(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "verifyemail/{emailId}")] HttpRequest req, string emailId)

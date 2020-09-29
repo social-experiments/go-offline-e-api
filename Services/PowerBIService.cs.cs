@@ -1,18 +1,25 @@
-﻿using goOfflineE.Helpers;
-using goOfflineE.Models;
-using Microsoft.PowerBI.Api;
-using Microsoft.PowerBI.Api.Models;
-using Microsoft.Rest;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-namespace goOfflineE.Services
+﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Models;
+    using Microsoft.PowerBI.Api;
+    using Microsoft.PowerBI.Api.Models;
+    using Microsoft.Rest;
+    using Newtonsoft.Json.Linq;
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="PowerBIService" />.
+    /// </summary>
     public class PowerBIService : IPowerBIService
     {
+        /// <summary>
+        /// The PowerBIAccessToken.
+        /// </summary>
+        /// <returns>The <see cref="Task{string}"/>.</returns>
         private async Task<string> PowerBIAccessToken()
         {
             using (var client = new HttpClient())
@@ -42,6 +49,10 @@ namespace goOfflineE.Services
             }
         }
 
+        /// <summary>
+        /// The GetPowerBIAccessToken.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{PowerBIResponse}}"/>.</returns>
         public async Task<IEnumerable<PowerBIResponse>> GetPowerBIAccessToken()
         {
             var accessToken = await PowerBIAccessToken();

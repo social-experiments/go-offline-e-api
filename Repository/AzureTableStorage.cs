@@ -1,20 +1,30 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Aducati.Azure.TableStorage.Repository
+﻿namespace goOfflineE.Repository
 {
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Defines the <see cref="AzureTableStorage" />.
+    /// </summary>
     public class AzureTableStorage : ITableStorage
     {
+        /// <summary>
+        /// Defines the _client.
+        /// </summary>
         private readonly CloudTableClient _client;
+
+        /// <summary>
+        /// Defines the _tables.
+        /// </summary>
         private ConcurrentDictionary<string, CloudTable> _tables;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureTableStorage" /> class.
+        /// Initializes a new instance of the <see cref="AzureTableStorage"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         public AzureTableStorage(string connectionString)
@@ -28,11 +38,11 @@ namespace Aducati.Azure.TableStorage.Repository
         /// <summary>
         /// Gets the entity.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
+        /// <typeparam name="T">.</typeparam>
+        /// <param name="tableName">.</param>
         /// <param name="partitionKey">The partition key.</param>
         /// <param name="rowKey">The row key.</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public async Task<T> GetAsync<T>(string tableName, string partitionKey, string rowKey) where T : class, ITableEntity
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -44,6 +54,12 @@ namespace Aducati.Azure.TableStorage.Repository
             return result.Result as T;
         }
 
+        /// <summary>
+        /// The GetAllAsync.
+        /// </summary>
+        /// <typeparam name="T">.</typeparam>
+        /// <param name="tableName">The tableName<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{T}}"/>.</returns>
         public async Task<IEnumerable<T>> GetAllAsync<T>(string tableName) where T : class, ITableEntity, new()
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -63,8 +79,10 @@ namespace Aducati.Azure.TableStorage.Repository
         /// Gets entities by query. 
         /// Supports TakeCount parameter.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">.</typeparam>
+        /// <param name="tableName">The tableName<see cref="string"/>.</param>
+        /// <param name="query">The query<see cref="TableQuery{T}"/>.</param>
+        /// <returns>.</returns>
         public async Task<IEnumerable<T>> QueryAsync<T>(string tableName, TableQuery<T> query) where T : class, ITableEntity, new()
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -81,7 +99,7 @@ namespace Aducati.Azure.TableStorage.Repository
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public async Task<object> AddOrUpdateAsync(string tableName, ITableEntity entity)
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -97,7 +115,7 @@ namespace Aducati.Azure.TableStorage.Repository
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public async Task<object> DeleteAsync(string tableName, ITableEntity entity)
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -114,7 +132,7 @@ namespace Aducati.Azure.TableStorage.Repository
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public async Task<object> AddAsync(string tableName, ITableEntity entity)
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -129,10 +147,11 @@ namespace Aducati.Azure.TableStorage.Repository
         /// <summary>
         /// Insert a batch of entities. Support adding more than 100 entities.
         /// </summary>
+        /// <typeparam name="T">.</typeparam>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entities">Collection of entities.</param>
-        /// <param name="options">Batch operation options</param>
-        /// <returns></returns>
+        /// <param name="options">Batch operation options.</param>
+        /// <returns>.</returns>
         public async Task<IEnumerable<T>> AddBatchAsync<T>(string tableName, IEnumerable<ITableEntity> entities, BatchOperationOptions options = null) where T : class, ITableEntity, new()
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -179,7 +198,7 @@ namespace Aducati.Azure.TableStorage.Repository
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="entity">The entity.</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public async Task<object> UpdateAsync(string tableName, ITableEntity entity)
         {
             var table = await EnsureTable(tableName).ConfigureAwait(false);
@@ -193,6 +212,8 @@ namespace Aducati.Azure.TableStorage.Repository
         /// <summary>
         /// Ensures existence of the table.
         /// </summary>
+        /// <param name="tableName">The tableName<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{CloudTable}"/>.</returns>
         private async Task<CloudTable> EnsureTable(string tableName)
         {
             if (!_tables.ContainsKey(tableName))
@@ -206,12 +227,12 @@ namespace Aducati.Azure.TableStorage.Repository
         }
 
         /// <summary>
-        /// Gets entities by query
+        /// Gets entities by query.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="table"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">.</typeparam>
+        /// <param name="table">.</param>
+        /// <param name="query">.</param>
+        /// <returns>.</returns>
         private async Task<IEnumerable<T>> QueryAsync<T>(CloudTable table, TableQuery<T> query)
             where T : class, ITableEntity, new()
         {
@@ -229,12 +250,12 @@ namespace Aducati.Azure.TableStorage.Repository
         }
 
         /// <summary>
-        /// Get entities by query with TakeCount parameter
+        /// Get entities by query with TakeCount parameter.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="table"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">.</typeparam>
+        /// <param name="table">.</param>
+        /// <param name="query">.</param>
+        /// <returns>.</returns>
         private async Task<IEnumerable<T>> QueryAsyncWithTakeCount<T>(CloudTable table, TableQuery<T> query)
             where T : class, ITableEntity, new()
         {

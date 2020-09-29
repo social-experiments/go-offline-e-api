@@ -1,15 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace goOfflineE.Models
+﻿namespace goOfflineE.Models
 {
+    using System.IO;
+
+    /// <summary>
+    /// Defines the <see cref="TrainStudentFace" />.
+    /// </summary>
     public class TrainStudentFace
     {
+        /// <summary>
+        /// Gets or sets the SchoolId.
+        /// </summary>
         public string SchoolId { get; set; }
-        public string StudentId { get; set; }
-        public Stream Photo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the StudentId.
+        /// </summary>
+        public string StudentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Photo.
+        /// </summary>
+        public Stream Photo { get; set; }
     }
 }

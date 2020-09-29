@@ -1,9 +1,9 @@
 ﻿namespace goOfflineE.Services
 {
-    using Aducati.Azure.TableStorage.Repository;
     using AutoMapper;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
+    using goOfflineE.Repository;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
@@ -149,7 +149,7 @@
             var schoolData = this._mapper.Map<IEnumerable<Models.School>>(schools);
             foreach (var school in schoolData)
             {
-                school.ClassRooms = ( await _classService.GetAll(school.Id)).ToList();
+                school.ClassRooms = (await _classService.GetAll(school.Id)).ToList();
                 school.Teachers = (await _teacherService.GetAll(school.Id)).ToList();
             }
             return schoolData;
@@ -168,6 +168,11 @@
             return schoolQuery.SingleOrDefault();
         }
 
+        /// <summary>
+        /// The Get.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{School}"/>.</returns>
         public async Task<School> Get(string schoolId)
         {
             var school = await GetSchool(schoolId);
