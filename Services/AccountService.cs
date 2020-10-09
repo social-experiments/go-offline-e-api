@@ -51,7 +51,10 @@
         /// </summary>
         private readonly IMapper _mapper;
 
-         private readonly IContentService _contentService;
+        /// <summary>
+        /// Defines the _contentService.
+        /// </summary>
+        private readonly IContentService _contentService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
@@ -61,10 +64,11 @@
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
         /// <param name="classService">The classService<see cref="IClassService"/>.</param>
-        public AccountService(ITableStorage tableStorage, 
-            ISchoolService schoolService, 
-            IMapper mapper, 
-            IStudentService studentService, 
+        /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
+        public AccountService(ITableStorage tableStorage,
+            ISchoolService schoolService,
+            IMapper mapper,
+            IStudentService studentService,
             IClassService classService,
             IContentService contentService)
         {
@@ -225,7 +229,7 @@
         /// </summary>
         /// <param name="model">The model<see cref="CreateRequest"/>.</param>
         /// <returns>The <see cref="Task{AccountResponse}"/>.</returns>
-        public  Task<AccountResponse> Create(CreateRequest model)
+        public Task<AccountResponse> Create(CreateRequest model)
         {
             throw new NotImplementedException();
         }

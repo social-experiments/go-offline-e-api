@@ -20,12 +20,10 @@
         /// Defines the Insert.
         /// </summary>
         Insert,
-
         /// <summary>
         /// Defines the InsertOrReplace.
         /// </summary>
         InsertOrReplace,
-
         /// <summary>
         /// Defines the InsertOrMerge.
         /// </summary>

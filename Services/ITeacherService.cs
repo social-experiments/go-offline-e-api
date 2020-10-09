@@ -22,5 +22,12 @@
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{TeacherResponse}}"/>.</returns>
         Task<IEnumerable<TeacherResponse>> GetAll(string schoolId);
+
+        /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="teacherId">The teacherId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task Delete(string teacherId);
     }
 }

@@ -82,5 +82,26 @@ namespace goOfflineE.Functions
 
             return new OkObjectResult(response);
         }
+
+        /// <summary>
+        /// The TeacherDelete.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="teacherId">The teacherId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("TeacherDelete")]
+        public async Task<IActionResult> TeacherDelete(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "teacher/{teacherId}/delete")] HttpRequest req, string teacherId)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            await _teacherService.Delete(teacherId);
+
+            return new OkObjectResult(new { message = "Delete teacher successful." });
+        }
     }
 }

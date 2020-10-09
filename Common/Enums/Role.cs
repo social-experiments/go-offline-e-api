@@ -9,17 +9,14 @@ namespace goOfflineE.Common.Enums
         /// Defines the SuperAdmin.
         /// </summary>
         SuperAdmin,
-
         /// <summary>
         /// Defines the SuperSchoolAdmin.
         /// </summary>
         SuperSchoolAdmin,
-
         /// <summary>
         /// Defines the Teacher.
         /// </summary>
         Teacher,
-
         /// <summary>
         /// Defines the Student.
         /// </summary>

@@ -130,6 +130,31 @@
         }
 
         /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task Delete(string studentId)
+        {
+            TableQuery<Entites.Student> studentQuery = new TableQuery<Entites.Student>()
+                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, studentId));
+            var students = await _tableStorage.QueryAsync<Entites.Student>("Student", studentQuery);
+
+            var student = students.FirstOrDefault();
+
+            student.Active = false;
+
+            try
+            {
+                await _tableStorage.UpdateAsync("Student", student);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("update student error: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
         /// The GetAll.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
@@ -152,6 +177,7 @@
             var students = await _tableStorage.QueryAsync<Entites.Student>("Student", studentQuery);
 
             var studentList = from student in students
+                              where student.Active.GetValueOrDefault(false)
                               orderby student.UpdatedOn descending
                               select new StudentResponse
                               {

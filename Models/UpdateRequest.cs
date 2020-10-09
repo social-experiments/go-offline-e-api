@@ -67,7 +67,6 @@ namespace goOfflineE.Models
         [Compare("Password")]
         public string ConfirmPassword { get => _confirmPassword; set => _confirmPassword = replaceEmptyWithNull(value); }
 
-        // helpers
         /// <summary>
         /// The replaceEmptyWithNull.
         /// </summary>

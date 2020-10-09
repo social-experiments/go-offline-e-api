@@ -151,6 +151,31 @@
         }
 
         /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="teacherId">The teacherId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task Delete(string teacherId)
+        {
+            TableQuery<Entites.Teacher> teacherQuery = new TableQuery<Entites.Teacher>()
+                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, teacherId));
+            var teachers = await _tableStorage.QueryAsync<Entites.Teacher>("Teacher", teacherQuery);
+
+            var teacher = teachers.FirstOrDefault();
+
+            teacher.Active = false;
+
+            try
+            {
+                await _tableStorage.UpdateAsync("Teacher", teacher);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("update teacher error: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
         /// The GetAll.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
@@ -167,6 +192,7 @@
             var teachersList = from user in users
                                join teacher in teachers
                                     on user.RowKey equals teacher.RowKey
+                               where teacher.Active.GetValueOrDefault(false)
                                orderby teacher.UpdatedOn descending
                                select new TeacherResponse
                                {

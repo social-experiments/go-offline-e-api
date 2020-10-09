@@ -5,10 +5,13 @@
     /// </summary>
     public class Content : BaseEntity
     {
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Content"/> class.
+        /// </summary>
         public Content()
         {
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Content"/> class.
         /// </summary>

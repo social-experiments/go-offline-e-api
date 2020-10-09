@@ -115,6 +115,31 @@
         }
 
         /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task Delete(string classId)
+        {
+            TableQuery<Entites.ClassRoom> classQuery = new TableQuery<Entites.ClassRoom>()
+                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, classId));
+            var classRooms = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", classQuery);
+
+            var classRoom = classRooms.FirstOrDefault();
+
+            classRoom.Active = false;
+
+            try
+            {
+                await _tableStorage.UpdateAsync("ClassRoom", classRoom);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("update class Room error: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
         /// The Get.
         /// </summary>
         /// <param name="classRoomId">The classRoomId<see cref="string"/>.</param>
@@ -147,6 +172,7 @@
                   .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
             var classRoomQuery = await _tableStorage.QueryAsync<Entites.ClassRoom>("ClassRoom", classQuery);
             var classList = from classRoom in classRoomQuery
+                            where classRoom.Active.GetValueOrDefault(false)
                             orderby classRoom.UpdatedOn descending
                             select classRoom;
             var classRoomList = new List<ClassRoom>();

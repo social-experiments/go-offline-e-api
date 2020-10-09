@@ -67,14 +67,10 @@ namespace goOfflineE.Functions
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("StudentList")]
         [OpenApiOperation("List", "Student")]
-        //[QueryStringParameter("schoolId", "School id", DataType = typeof(string), Required = true)]
-        //[QueryStringParameter("classId", "Class id", DataType = typeof(string), Required = true)]
         public async Task<IActionResult> StudentList(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students/{schoolId}/{classId}")] HttpRequest req, string schoolId, string classId)
         {
             var validateStatus = base.AuthorizationStatus(req);
-            // string schoolId = req.Query["schoolId"];
-            //schoolId = schoolId ?? id;
             if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId))
             {
                 return new BadRequestObjectResult(validateStatus);
@@ -83,6 +79,27 @@ namespace goOfflineE.Functions
             var response = await _studentService.GetAll(schoolId, classId);
 
             return new OkObjectResult(response);
+        }
+
+        /// <summary>
+        /// The StudentDelete.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("StudentDelete")]
+        public async Task<IActionResult> StudentDelete(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "student/{studentId}/delete")] HttpRequest req, string studentId)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            await _studentService.Delete(studentId);
+
+            return new OkObjectResult(new { message = "Delete student successful." });
         }
     }
 }

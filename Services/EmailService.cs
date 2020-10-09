@@ -1,7 +1,6 @@
 ﻿namespace goOfflineE.Services
 {
     using goOfflineE.Common.Constants;
-    using goOfflineE.Helpers;
     using goOfflineE.Models;
     using MailKit.Net.Smtp;
     using MimeKit;

@@ -9,17 +9,14 @@
         /// Defines the Valid.
         /// </summary>
         Valid,
-
         /// <summary>
         /// Defines the Expired.
         /// </summary>
         Expired,
-
         /// <summary>
         /// Defines the Error.
         /// </summary>
         Error,
-
         /// <summary>
         /// Defines the NoToken.
         /// </summary>
