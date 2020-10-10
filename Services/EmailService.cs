@@ -45,7 +45,7 @@
                 catch (Exception)
                 {
                     //log an error message or throw an exception, or both.
-                    throw;
+                   
                 }
                 finally
                 {

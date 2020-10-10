@@ -144,7 +144,6 @@
                 }
                 catch (Exception ex)
                 {
-
                     throw new AppException("Create teacher error: ", ex.InnerException);
                 }
             }
