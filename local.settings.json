@@ -1,8 +1,8 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AccountKey": "+4scUzk7yiPO1ltE+cPwnf/lwOyg2V8RAyJMDEb0jjxRcQFxQDjWS/BV9Q8YZyMp5XtOo0uyMhD0ipJJ1f76LQ==",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=goofflinee;AccountKey=+4scUzk7yiPO1ltE+cPwnf/lwOyg2V8RAyJMDEb0jjxRcQFxQDjWS/BV9Q8YZyMp5XtOo0uyMhD0ipJJ1f76LQ==;EndpointSuffix=core.windows.net",
+    "AccountKey": "wiOiiEc0V5ZCYSZOCXoOW/s9Bh9VKn8JOTdUcA3e0qTQ4bXcF4zsQjiUdfcOHJ5oMHsaMAJL5kosW4Z28huEiw==",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=takmil;AccountKey=wiOiiEc0V5ZCYSZOCXoOW/s9Bh9VKn8JOTdUcA3e0qTQ4bXcF4zsQjiUdfcOHJ5oMHsaMAJL5kosW4Z28huEiw==;EndpointSuffix=core.windows.net",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "ISSUER_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwibmJmIjoxNTk0OTg3MTY3LCJleHAiOjE1OTU1OTE5NjcsImlhdCI6MTU5NDk4NzE2NywiaXNzIjoiSXNzdWVyIiwiYXVkIjoiQXVkaWVuY2UifQ.fEPJyK354PXszYdNncqBXl7RCgUN7v5fRs2G4zyaH2Q",
     "AUDIENCE": "goOfflineE",

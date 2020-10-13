@@ -106,7 +106,7 @@
             {
                 // Register user as teacher
                 var userId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
-                var defaultPasswrod = SettingConfigurations.GetRandomPassword(10);
+                var defaultPasswrod = "teacher@123"; //SettingConfigurations.GetRandomPassword(10);
                 RegisterRequest registerRequest = new RegisterRequest
                 {
                     Email = model.Email,
