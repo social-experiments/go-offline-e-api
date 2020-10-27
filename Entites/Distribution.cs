@@ -24,7 +24,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the classId.
+        /// Gets or sets the ClassId.
         /// </summary>
         public string ClassId { get; set; }
 

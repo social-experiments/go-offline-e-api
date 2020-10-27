@@ -26,9 +26,10 @@ namespace goOfflineE.Models
         /// </summary>
         public List<School> Schools { get; set; }
 
-
+        /// <summary>
+        /// Gets or sets the CourseContent.
+        /// </summary>
         public List<Content> CourseContent { get; set; }
-        
 
         /// <summary>
         /// Gets or sets the FirstName.

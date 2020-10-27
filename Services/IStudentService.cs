@@ -31,5 +31,12 @@
         /// <param name="studentPhotos">The studentPhotos<see cref="List{string}"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task UpdateStudentProfile(string studentId, List<string> studentPhotos);
+
+        /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task Delete(string studentId);
     }
 }

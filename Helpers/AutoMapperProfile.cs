@@ -9,7 +9,6 @@ namespace goOfflineE.Helpers
     /// </summary>
     public class AutoMapperProfile : Profile
     {
-        // mappings between model and entity objects
         /// <summary>
         /// Initializes a new instance of the <see cref="AutoMapperProfile"/> class.
         /// </summary>

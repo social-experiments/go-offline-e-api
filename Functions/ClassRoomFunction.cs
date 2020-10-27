@@ -91,5 +91,26 @@ namespace goOfflineE.Functions
 
             return new OkObjectResult(response);
         }
+
+        /// <summary>
+        /// The ClassRoomDelete.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="classRoomId">The classRoomId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("ClassRoomDelete")]
+        public async Task<IActionResult> ClassRoomDelete(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "class-room/{classRoomId}/delete")] HttpRequest req, string classRoomId)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            await _classService.Delete(classRoomId);
+
+            return new OkObjectResult(new { message = "Delete class room successful." });
+        }
     }
 }

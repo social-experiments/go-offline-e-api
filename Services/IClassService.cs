@@ -29,5 +29,12 @@
         /// <param name="classRoomId">The classRoomId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{ClassRoom}"/>.</returns>
         Task<ClassRoom> Get(string classRoomId);
+
+        /// <summary>
+        /// The Delete.
+        /// </summary>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task Delete(string classId);
     }
 }

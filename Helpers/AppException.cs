@@ -3,8 +3,6 @@ namespace goOfflineE.Helpers
     using System;
     using System.Globalization;
 
-    // custom exception class for throwing application specific exceptions 
-    // that can be caught and handled within the application
     /// <summary>
     /// Defines the <see cref="AppException" />.
     /// </summary>

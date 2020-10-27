@@ -1,7 +1,6 @@
 ﻿namespace goOfflineE.Services
 {
     using goOfflineE.Common.Constants;
-    using goOfflineE.Helpers;
     using goOfflineE.Models;
     using MailKit.Net.Smtp;
     using MimeKit;
@@ -46,7 +45,7 @@
                 catch (Exception)
                 {
                     //log an error message or throw an exception, or both.
-                    throw;
+                   
                 }
                 finally
                 {
