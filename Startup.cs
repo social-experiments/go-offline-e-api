@@ -54,9 +54,10 @@ namespace goOfflineE
             services.AddTransient<IPowerBIService, PowerBIService>();
             services.AddTransient<IClassService, ClassService>();
             services.AddTransient<IStudentService, StudentService>();
-            services.AddTransient<IAzureBlobService, AzureBlobService>();
+            services.AddTransient<IAzureBlobService, AzureBlobService>(); 
             services.AddTransient<ICognitiveService, CognitiveService>();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IAssignmentService, AssignmentService>();
 
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
             services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),

@@ -347,5 +347,10 @@
 
             return response;
         }
+
+        public Task<AuthenticateResponse> SyncData(string schoolId = null, string classId = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

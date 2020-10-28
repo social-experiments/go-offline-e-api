@@ -78,5 +78,7 @@
         /// <param name="id">The id<see cref="string"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task Delete(string id);
+
+        Task<AuthenticateResponse> SyncData(string schoolId = null, string classId = null);
     }
 }
