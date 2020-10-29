@@ -1,12 +1,18 @@
 ﻿namespace goOfflineE.Models
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Defines the <see cref="TeacherAssignment" />.
     /// </summary>
     public class TeacherAssignment
     {
+
+        public TeacherAssignment()
+        {
+            this.StudentAssignments = new List<StudentAssignment>();
+        }
         /// <summary>
         /// Gets or sets the Id.
         /// </summary>
@@ -52,9 +58,9 @@
         /// </summary>
         public string AssignmentURL { get; set; }
 
-        /// <summary>
-        /// Gets or sets the StudentAssignments.
-        /// </summary>
-        public string StudentAssignments { get; set; }
+        public List<StudentAssignment> StudentAssignments { get; set; }
+
+
+
     }
 }

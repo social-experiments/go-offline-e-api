@@ -4,7 +4,6 @@
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using Microsoft.WindowsAzure.Storage.Table;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -36,32 +35,29 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateStudentAssigments(StudentAssignment model)
         {
-            var assignments = await _tableStorage.GetAllAsync<Entites.Assignment>("Assignment");
-            var assignment = assignments.SingleOrDefault(asmt => asmt.RowKey == model.Id);
+            var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
 
-            if (assignment != null)
+            var assignment = new Entites.StudentAssignment(model.SchoolId, assignmentId)
             {
-                assignment.UpdatedOn = DateTime.UtcNow;
 
-                var studentAssignments = JsonConvert.SerializeObject(
-                    new StudentAssignment { 
-                        StudentName = model.StudentName, 
-                        AssignmentURL = model.AssignmentURL, 
-                        Id = model.Id,
-                        CreatedDate = DateTime.UtcNow
-                    }
-                    );
-                assignment.UpdatedBy = model.StudentName;
-                assignment.StudentAssigments = studentAssignments;
-               
-                try
-                {
-                    await _tableStorage.UpdateAsync("Assignment", assignment);
-                }
-                catch (Exception ex)
-                {
-                    throw new AppException("Create student assigment error: ", ex.InnerException);
-                }
+                StudentId = model.StudentId,
+                StudentName = model.StudentName,
+                AssignmentId = model.AssignmentId,
+                AssignmentURL = model.AssignmentURL,
+
+                Active = true,
+                CreatedBy = model.StudentId,
+                UpdatedOn = DateTime.UtcNow,
+                UpdatedBy = model.StudentId,
+            };
+
+            try
+            {
+                await _tableStorage.AddAsync("StudentAssignment", assignment);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Create student assigment error: ", ex.InnerException);
             }
         }
 
@@ -74,7 +70,7 @@
         {
             var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
 
-            var newStudent = new Entites.Assignment(model.SchoolId, assignmentId)
+            var assignment = new Entites.Assignment(model.SchoolId, assignmentId)
             {
 
                 AssignmentName = model.AssignmentName,
@@ -90,7 +86,7 @@
             };
             try
             {
-                await _tableStorage.AddAsync("Assignment", newStudent);
+                await _tableStorage.AddAsync("Assignment", assignment);
             }
             catch (Exception ex)
             {
@@ -101,8 +97,8 @@
         /// <summary>
         /// The GetAssignments.
         /// </summary>
-        /// <param name="className">The className<see cref="string"/>.</param>
-        /// <param name="subjectName">The subjectName<see cref="string"/>.</param>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{TeacherAssignment}}"/>.</returns>
         public async Task<IEnumerable<TeacherAssignment>> GetAssignments(string schoolId, string classId)
         {
@@ -110,7 +106,13 @@
                  .Where(TableQuery.GenerateFilterCondition("ClassId", QueryComparisons.Equal, classId));
             var assignments = await _tableStorage.QueryAsync<Entites.Assignment>("Assignment", assignmentQuery);
 
+            TableQuery<Entites.StudentAssignment> query = new TableQuery<Entites.StudentAssignment>()
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
+            var studentAssignments = await _tableStorage.QueryAsync<Entites.StudentAssignment>("StudentAssignment", query);
+
             var assignmentList = from assignment in assignments
+                                 join sassignment in studentAssignments
+                                on assignment.RowKey equals sassignment.AssignmentId into studassignments
                                  where assignment.Active.GetValueOrDefault(false)
                                  orderby assignment.UpdatedOn descending
                                  select new TeacherAssignment
@@ -121,7 +123,17 @@
                                      AssignmentDescription = assignment.AssignmentDescription,
                                      AssignmentURL = assignment.AssignmentURL,
                                      SubjectName = assignment.SubjectName,
-                                     StudentAssignments = assignment.StudentAssigments
+                                     StudentAssignments = (from sa in studassignments
+                                                           select new StudentAssignment
+                                                           {
+                                                               AssignmentId = sa.AssignmentId,
+                                                               AssignmentURL = sa.AssignmentURL,
+                                                               SchoolId = sa.PartitionKey,
+                                                               Id = sa.RowKey,
+                                                               StudentId = sa.StudentId,
+                                                               StudentName = sa.StudentName,
+                                                               CreatedDate = sa.Timestamp.DateTime
+                                                           }).ToList()
                                  };
 
             return assignmentList;
