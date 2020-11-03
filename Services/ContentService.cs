@@ -73,6 +73,7 @@
                 //Update class information
                 content.CourseName = model.CourseName;
                 content.CourseDescription = model.CourseDescription;
+                content.CourseLevel = model.CourseLevel;
                 content.Active = true;
                 content.UpdatedOn = DateTime.UtcNow;
                 content.UpdatedBy = model.CreatedBy;
@@ -92,10 +93,11 @@
                 // Create new content
                 var contentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
 
-                var newContent = new Entites.Content(model.CategoryName, contentId)
+                var newContent = new Entites.Content(model.CourseCategory, contentId)
                 {
                     CourseName = model.CourseName,
                     CourseDescription = model.CourseDescription,
+                    CourseLevel = model.CourseLevel,
                     CourseURL = model.CourseURL,
                     ThumbnailURL = model.ThumbnailURL,
                     Active = true,
@@ -141,6 +143,7 @@
             contents = from dcontent in distributedContent.Where(d => d.PartitionKey == schoolId && d.ClassId == classId)
                        join content in contents
                             on dcontent.ContentId equals content.RowKey
+                            orderby content.UpdatedOn descending
                        select content;
 
             return MapContent(contents);
@@ -160,7 +163,8 @@
                 contentList.Add(new Content
                 {
                     Id = content.RowKey,
-                    CategoryName = content.PartitionKey,
+                    CourseCategory = content.PartitionKey,
+                    CourseLevel = content.CourseLevel,
                     CourseName = content.CourseName,
                     CourseDescription = content.CourseDescription,
                     CourseURL = content.CourseURL,

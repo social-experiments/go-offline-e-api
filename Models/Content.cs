@@ -11,6 +11,11 @@
         public string Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the SchoolId.
+        /// </summary>
+        public string SchoolId { get; set; }
+
+        /// <summary>
         /// Gets or sets the CourseName.
         /// </summary>
         public string CourseName { get; set; }
@@ -21,9 +26,14 @@
         public string CourseDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets the CategoryName.
+        /// Gets or sets the CourseCategory.
         /// </summary>
-        public string CategoryName { get; set; }
+        public string CourseCategory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CourseLevel.
+        /// </summary>
+        public string CourseLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the CourseURL.
