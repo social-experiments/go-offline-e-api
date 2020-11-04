@@ -15,11 +15,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="Content"/> class.
         /// </summary>
-        /// <param name="categoryName">The categoryName<see cref="string"/>.</param>
+        /// <param name="courseCategory">The courseCategory<see cref="string"/>.</param>
         /// <param name="courseId">The courseId<see cref="string"/>.</param>
-        public Content(string categoryName, string courseId)
+        public Content(string courseCategory, string courseId)
         {
-            this.PartitionKey = categoryName;
+            this.PartitionKey = courseCategory;
             this.RowKey = courseId;
         }
 
@@ -27,6 +27,11 @@
         /// Gets or sets the CourseName.
         /// </summary>
         public string CourseName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CourseLevel.
+        /// </summary>
+        public string CourseLevel { get; set; }
 
         /// <summary>
         /// Gets or sets the CourseDescription.
