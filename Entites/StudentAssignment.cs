@@ -1,5 +1,7 @@
 ﻿namespace goOfflineE.Entites
 {
+    using goOfflineE.Common.Enums;
+
     /// <summary>
     /// Defines the <see cref="StudentAssignment" />.
     /// </summary>
@@ -42,5 +44,10 @@
         /// Gets or sets the AssignmentURL.
         /// </summary>
         public string AssignmentURL { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ReviewStatus.
+        /// </summary>
+        public AssignmentReviewStatus ReviewStatus { get; set; }
     }
 }

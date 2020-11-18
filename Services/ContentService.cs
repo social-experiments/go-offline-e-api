@@ -74,6 +74,7 @@
                 content.CourseName = model.CourseName;
                 content.CourseDescription = model.CourseDescription;
                 content.CourseLevel = model.CourseLevel;
+                content.CourseAssessment = model.CourseAssessment;
                 content.Active = true;
                 content.UpdatedOn = DateTime.UtcNow;
                 content.UpdatedBy = model.CreatedBy;
@@ -98,6 +99,7 @@
                     CourseName = model.CourseName,
                     CourseDescription = model.CourseDescription,
                     CourseLevel = model.CourseLevel,
+                    CourseAssessment = model.CourseAssessment,
                     CourseURL = model.CourseURL,
                     ThumbnailURL = model.ThumbnailURL,
                     Active = true,
@@ -165,6 +167,7 @@
                     Id = content.RowKey,
                     CourseCategory = content.PartitionKey,
                     CourseLevel = content.CourseLevel,
+                    CourseAssessment = content.CourseAssessment,
                     CourseName = content.CourseName,
                     CourseDescription = content.CourseDescription,
                     CourseURL = content.CourseURL,

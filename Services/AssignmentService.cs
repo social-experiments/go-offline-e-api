@@ -1,12 +1,13 @@
 ﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Common.Enums;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Linq; 
     using System.Threading.Tasks;
 
     /// <summary>
@@ -37,27 +38,48 @@
         {
             var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
 
-            var assignment = new Entites.StudentAssignment(model.SchoolId, assignmentId)
-            {
+            var studentAssignment = await _tableStorage.GetAllAsync<Entites.StudentAssignment>("StudentAssignment");
+            var content = studentAssignment.SingleOrDefault(assignment => assignment.RowKey == model.Id);
 
-                StudentId = model.StudentId,
-                StudentName = model.StudentName,
-                AssignmentId = model.AssignmentId,
-                AssignmentURL = model.AssignmentURL,
+            if (content != null)
+            {
+                content.ReviewStatus = AssignmentReviewStatus.Completed;
+                content.UpdatedOn = DateTime.UtcNow;
+
+                try
+                {
+                    await _tableStorage.UpdateAsync("StudentAssignment", content);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("update student assignment error: ", ex.InnerException);
+                }
+            }
+            else
+            {
+                var assignment = new Entites.StudentAssignment(model.SchoolId, assignmentId)
+                {
+
+                    StudentId = model.StudentId,
+                    StudentName = model.StudentName,
+                    AssignmentId = model.AssignmentId,
+                    AssignmentURL = model.AssignmentURL,
+                    ReviewStatus = AssignmentReviewStatus.UnderReview,
 
                 Active = true,
-                CreatedBy = model.StudentId,
-                UpdatedOn = DateTime.UtcNow,
-                UpdatedBy = model.StudentId,
-            };
+                    CreatedBy = model.StudentId,
+                    UpdatedOn = DateTime.UtcNow,
+                    UpdatedBy = model.StudentId,
+                };
 
-            try
-            {
-                await _tableStorage.AddAsync("StudentAssignment", assignment);
-            }
-            catch (Exception ex)
-            {
-                throw new AppException("Create student assigment error: ", ex.InnerException);
+                try
+                {
+                    await _tableStorage.AddAsync("StudentAssignment", assignment);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Create student assigment error: ", ex.InnerException);
+                }
             }
         }
 
@@ -132,7 +154,8 @@
                                                                Id = sa.RowKey,
                                                                StudentId = sa.StudentId,
                                                                StudentName = sa.StudentName,
-                                                               CreatedDate = sa.Timestamp.DateTime
+                                                               CreatedDate = sa.UpdatedOn.GetValueOrDefault(DateTime.UtcNow),
+                                                               ReviewStatus = sa.ReviewStatus
                                                            }).ToList()
                                  };
 
