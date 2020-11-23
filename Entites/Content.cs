@@ -33,6 +33,9 @@
         /// </summary>
         public string CourseLevel { get; set; }
 
+        public string CourseAssessment { get; set; }
+        
+
         /// <summary>
         /// Gets or sets the CourseDescription.
         /// </summary>

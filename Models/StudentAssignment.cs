@@ -1,5 +1,6 @@
 ﻿namespace goOfflineE.Models
 {
+    using goOfflineE.Common.Enums;
     using System;
 
     /// <summary>
@@ -41,5 +42,10 @@
         /// Gets or sets the CreatedDate.
         /// </summary>
         public DateTime CreatedDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ReviewStatus.
+        /// </summary>
+        public AssignmentReviewStatus ReviewStatus { get; set; }
     }
 }
