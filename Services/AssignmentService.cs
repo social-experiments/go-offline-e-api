@@ -36,7 +36,7 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateStudentAssigments(StudentAssignment model)
         {
-            var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+           
 
             var studentAssignment = await _tableStorage.GetAllAsync<Entites.StudentAssignment>("StudentAssignment");
             var content = studentAssignment.SingleOrDefault(assignment => assignment.RowKey == model.Id);
@@ -57,6 +57,8 @@
             }
             else
             {
+                var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+
                 var assignment = new Entites.StudentAssignment(model.SchoolId, assignmentId)
                 {
 
