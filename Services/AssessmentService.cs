@@ -4,6 +4,7 @@
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using Microsoft.WindowsAzure.Storage.Table;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -14,6 +15,13 @@
     /// </summary>
     public class AssessmentService : IAssessmentService
     {
+
+        private JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            MissingMemberHandling = MissingMemberHandling.Ignore
+        };
+
         /// <summary>
         /// Defines the _tableStorage.
         /// </summary>
@@ -42,7 +50,7 @@
 
                 AssessmentTitle = model.AssessmentTitle,
                 AssessmentDescription = model.AssessmentDescription,
-                AssessmentQuiz = model.AssessmentQuiz,
+                AssessmentQuiz = JsonConvert.SerializeObject(model.AssessmentQuestions),
                 ClassId = model.ClassId,
                 SubjectName = model.SubjectName,
 
@@ -75,7 +83,7 @@
                 StudentId = model.StudentId,
                 StudentName = model.StudentName,
                 AssessmentId = model.AssessmentId,
-                AssessmentAnswers = model.AssessmentAnswers,
+                AssessmentAnswers = JsonConvert.SerializeObject(model.AssessmentAnswers),
                 Attempts = model.Attempts,
 
                 Active = true,
@@ -98,12 +106,11 @@
         /// The GetAssessments.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
-        /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{Assessment}}"/>.</returns>
-        public async Task<IEnumerable<Assessment>> GetAssessments(string schoolId, string classId)
+        public async Task<IEnumerable<Assessment>> GetAssessments(string schoolId)
         {
             TableQuery<Entites.Assessment> assessmentQuery = new TableQuery<Entites.Assessment>()
-                 .Where(TableQuery.GenerateFilterCondition("ClassId", QueryComparisons.Equal, classId));
+                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
             var assessments = await _tableStorage.QueryAsync<Entites.Assessment>("Assessments", assessmentQuery);
 
             var assessmentList = from assessment in assessments
@@ -115,7 +122,8 @@
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentTitle = assessment.AssessmentTitle,
                                      AssessmentDescription = assessment.AssessmentDescription,
-                                     AssessmentQuiz = assessment.AssessmentQuiz,
+                                     AssessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(assessment.AssessmentQuiz, jsonSettings),
+                                     ClassId = assessment.ClassId,
                                      SubjectName = assessment.SubjectName
                                  };
 
@@ -142,7 +150,7 @@
                                      Id = assessment.RowKey,
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
-                                     AssessmentAnswers = assessment.AssessmentAnswers,
+                                     AssessmentAnswers = JsonConvert.DeserializeObject<List<Answer>>(assessment.AssessmentAnswers, jsonSettings),
                                      Attempts = assessment.Attempts,
                                      StudentId = assessment.StudentId,
                                      StudentName = assessment.StudentName

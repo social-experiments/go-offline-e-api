@@ -8,6 +8,13 @@
     /// </summary>
     public class Assessment
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Assessment"/> class.
+        /// </summary>
+        public Assessment()
+        {
+            this.AssessmentQuestions = new List<Question>();
+        }
 
         /// <summary>
         /// Gets or sets the Id.
@@ -50,10 +57,8 @@
         public string AssessmentDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets the AssessmentQuiz.
+        /// Gets or sets the AssessmentQuestions.
         /// </summary>
-        public string AssessmentQuiz { get; set; }
-
-       
+        public List<Question> AssessmentQuestions { get; set; }
     }
 }

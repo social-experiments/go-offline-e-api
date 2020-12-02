@@ -24,7 +24,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the AssessmentName.
+        /// Gets or sets the AssessmentTitle.
         /// </summary>
         public string AssessmentTitle { get; set; }
 

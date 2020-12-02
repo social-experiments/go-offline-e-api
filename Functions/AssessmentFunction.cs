@@ -40,7 +40,7 @@ namespace goOfflineE.Functions
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AssessmentCreateUpdate")]
         public async Task<IActionResult> CreateAssessment(
-          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assessment/teacher")]
+          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assessment/update")]
             [RequestBodyType(typeof(Assessment), "Create/update teacher assessment")] HttpRequest request)
         {
             var validateStatus = base.AuthorizationStatus(request);
@@ -64,7 +64,7 @@ namespace goOfflineE.Functions
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AssessmentStudentCreateUpdate")]
         public async Task<IActionResult> StudentAssessment(
-          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assessment/student")]
+          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assessment/student/update")]
             [RequestBodyType(typeof(StudentAssessment), "Create/update student assessment")] HttpRequest request)
         {
             var validateStatus = base.AuthorizationStatus(request);
@@ -88,18 +88,18 @@ namespace goOfflineE.Functions
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
-        [FunctionName("AssessmentList")]
+        [FunctionName("Assessments")]
         [OpenApiOperation("List", "Assessment")]
         public async Task<IActionResult> Assessments(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assessment/{schoolId}/{classId}")] HttpRequest req, string schoolId, string classId)
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assessments/{schoolId}")] HttpRequest req, string schoolId)
         {
             var validateStatus = base.AuthorizationStatus(req);
-            if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId) || String.IsNullOrEmpty(classId))
+            if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId))
             {
                 return new BadRequestObjectResult(validateStatus);
             }
 
-            var response = await _assessmentService.GetAssessments(schoolId, classId);
+            var response = await _assessmentService.GetAssessments(schoolId);
 
             return new OkObjectResult(response);
         }
@@ -111,10 +111,10 @@ namespace goOfflineE.Functions
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
-        [FunctionName("StudentAssessmentList")]
+        [FunctionName("StudentAssessments")]
         [OpenApiOperation("List", "StudentAssessments")]
         public async Task<IActionResult> StudentAssessments(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assessment/{schoolId}/{classId}/student")] HttpRequest req, string schoolId, string classId)
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assessments/{schoolId}/{classId}/student")] HttpRequest req, string schoolId, string classId)
         {
             var validateStatus = base.AuthorizationStatus(req);
             if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId) || String.IsNullOrEmpty(classId))

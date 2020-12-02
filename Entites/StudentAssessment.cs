@@ -29,6 +29,11 @@
         public string AssessmentId { get; set; }
 
         /// <summary>
+        /// Gets or sets the ClassId.
+        /// </summary>
+        public string ClassId { get; set; }
+
+        /// <summary>
         /// Gets or sets the StudentId.
         /// </summary>
         public string StudentId { get; set; }
