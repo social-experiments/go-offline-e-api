@@ -15,7 +15,9 @@
     /// </summary>
     public class AssessmentService : IAssessmentService
     {
-
+        /// <summary>
+        /// Defines the jsonSettings.
+        /// </summary>
         private JsonSerializerSettings jsonSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
@@ -43,29 +45,51 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateAssessment(Assessment model)
         {
-            var assessmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+            var assessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+            var assessment = assessments.SingleOrDefault(assessment => assessment.RowKey == model.Id);
 
-            var assessment = new Entites.Assessment(model.SchoolId, assessmentId)
+            if (assessment != null)
             {
+                assessment.AssessmentDescription = model.AssessmentDescription;
+                assessment.AssessmentTitle = model.AssessmentTitle;
+                assessment.SubjectName = model.SubjectName;
+                assessment.Active = model.Active;
 
-                AssessmentTitle = model.AssessmentTitle,
-                AssessmentDescription = model.AssessmentDescription,
-                AssessmentQuiz = JsonConvert.SerializeObject(model.AssessmentQuestions),
-                ClassId = model.ClassId,
-                SubjectName = model.SubjectName,
-
-                Active = true,
-                CreatedBy = model.CreatedBy,
-                UpdatedOn = DateTime.UtcNow,
-                UpdatedBy = model.CreatedBy,
-            };
-            try
-            {
-                await _tableStorage.AddAsync("Assessments", assessment);
+                try
+                {
+                    await _tableStorage.UpdateAsync("Assessments", assessment);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("update assessment error: ", ex.InnerException);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                throw new AppException("Create assessment error: ", ex.InnerException);
+                var assessmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+
+                assessment = new Entites.Assessment(model.SchoolId, assessmentId)
+                {
+
+                    AssessmentTitle = model.AssessmentTitle,
+                    AssessmentDescription = model.AssessmentDescription,
+                    AssessmentQuiz = JsonConvert.SerializeObject(model.AssessmentQuestions),
+                    ClassId = model.ClassId,
+                    SubjectName = model.SubjectName,
+
+                    Active = true,
+                    CreatedBy = model.CreatedBy,
+                    UpdatedOn = DateTime.UtcNow,
+                    UpdatedBy = model.CreatedBy,
+                };
+                try
+                {
+                    await _tableStorage.AddAsync("Assessments", assessment);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Create assessment error: ", ex.InnerException);
+                }
             }
         }
 

@@ -57,6 +57,11 @@
         public string AssessmentDescription { get; set; }
 
         /// <summary>
+        /// Gets or sets the Active.
+        /// </summary>
+        public bool? Active { set; get; }
+
+        /// <summary>
         /// Gets or sets the AssessmentQuestions.
         /// </summary>
         public List<Question> AssessmentQuestions { get; set; }

@@ -75,7 +75,7 @@
                 content.CourseDescription = model.CourseDescription;
                 content.CourseLevel = model.CourseLevel;
                 content.CourseAssessment = model.CourseAssessment;
-                content.Active = true;
+                content.Active = model.Active;
                 content.UpdatedOn = DateTime.UtcNow;
                 content.UpdatedBy = model.CreatedBy;
 
@@ -126,7 +126,9 @@
         public async Task<IEnumerable<Content>> GetAll()
         {
             var contents = await _tableStorage.GetAllAsync<Entites.Content>("Content");
-
+            contents = from content in contents
+                       where content.Active.GetValueOrDefault(false)
+                       select content;
             return MapContent(contents);
         }
 
@@ -145,7 +147,8 @@
             contents = from dcontent in distributedContent.Where(d => d.PartitionKey == schoolId && d.ClassId == classId)
                        join content in contents
                             on dcontent.ContentId equals content.RowKey
-                            orderby content.UpdatedOn descending
+                       orderby content.UpdatedOn descending
+                       where content.Active.GetValueOrDefault(false)
                        select content;
 
             return MapContent(contents);
@@ -172,6 +175,7 @@
                     CourseDescription = content.CourseDescription,
                     CourseURL = content.CourseURL,
                     ThumbnailURL = content.ThumbnailURL,
+                    Active = content.Active,
                 });
             }
 
