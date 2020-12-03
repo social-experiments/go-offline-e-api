@@ -35,6 +35,9 @@
         /// </summary>
         public string CourseLevel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the CourseAssessment.
+        /// </summary>
         public string CourseAssessment { get; set; }
 
         /// <summary>
@@ -51,5 +54,10 @@
         /// Gets or sets the CreatedBy.
         /// </summary>
         public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Active.
+        /// </summary>
+        public bool? Active { set; get; }
     }
 }
