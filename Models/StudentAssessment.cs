@@ -51,11 +51,7 @@
         /// </summary>
         public DateTime CreatedDate { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Attempts.
-        /// </summary>
-        public int Attempts { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the AssessmentAnswers.
         /// </summary>

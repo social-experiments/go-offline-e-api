@@ -48,9 +48,6 @@
         /// </summary>
         public string AssessmentAnswers { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Attempts.
-        /// </summary>
-        public int Attempts { get; set; }
+        
     }
 }

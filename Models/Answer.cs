@@ -16,13 +16,13 @@
         public int Attempts { get; set; }
 
         /// <summary>
-        /// Gets or sets the AnswerKey.
+        /// Gets or sets the OptionAnswer.
         /// </summary>
-        public int AnswerKey { get; set; }
+        public int OptionAnswer { get; set; }
 
         /// <summary>
-        /// Gets or sets the AttemptAnswer.
+        /// Gets or sets the ShortAnswer.
         /// </summary>
-        public string AttemptAnswer { get; set; }
+        public string ShortAnswer { get; set; }
     }
 }

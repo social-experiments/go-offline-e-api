@@ -17,11 +17,26 @@
         Task CreateAssessment(Assessment model);
 
         /// <summary>
+        /// The UpdateAssessmentQuestion.
+        /// </summary>
+        /// <param name="model">The model<see cref="Question"/>.</param>
+        /// <param name="assessmentId">The assessmentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task UpdateAssessmentQuestion(Question model, string assessmentId);
+
+        /// <summary>
         /// The CreateStudentAssigments.
         /// </summary>
         /// <param name="model">The model<see cref="StudentAssignment"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task CreateStudentAssessment(StudentAssessment model);
+
+        /// <summary>
+        /// The AssessmentShare.
+        /// </summary>
+        /// <param name="model">The model<see cref="AssessmentShare"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task AssessmentShare(AssessmentShare model);
 
         /// <summary>
         /// The GetAssignments.
@@ -31,11 +46,27 @@
         Task<IEnumerable<Assessment>> GetAssessments(string schoolId);
 
         /// <summary>
+        /// The GetAssessments.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{Assessment}}"/>.</returns>
+        Task<IEnumerable<Assessment>> GetAssessments(string schoolId, string classId, string studentId);
+
+        /// <summary>
+        /// The GetAssessmentSubjects.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{string}}"/>.</returns>
+        Task<List<string>> GetAssessmentSubjects();
+
+        /// <summary>
         /// The GetStudentAssessments.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{StudentAssessment}}"/>.</returns>
-        Task<IEnumerable<StudentAssessment>> GetStudentAssessments(string schoolId, string classId);
+        Task<IEnumerable<StudentAssessment>> GetStudentAssessments(string schoolId, string classId, string studentId);
     }
 }

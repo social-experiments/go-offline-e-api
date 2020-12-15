@@ -107,8 +107,8 @@
                 StudentId = model.StudentId,
                 StudentName = model.StudentName,
                 AssessmentId = model.AssessmentId,
+                ClassId = model.ClassId,
                 AssessmentAnswers = JsonConvert.SerializeObject(model.AssessmentAnswers),
-                Attempts = model.Attempts,
 
                 Active = true,
                 CreatedBy = model.StudentId,
@@ -133,9 +133,9 @@
         /// <returns>The <see cref="Task{IEnumerable{Assessment}}"/>.</returns>
         public async Task<IEnumerable<Assessment>> GetAssessments(string schoolId)
         {
-            TableQuery<Entites.Assessment> assessmentQuery = new TableQuery<Entites.Assessment>()
-                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
-            var assessments = await _tableStorage.QueryAsync<Entites.Assessment>("Assessments", assessmentQuery);
+            //TableQuery<Entites.Assessment> assessmentQuery = new TableQuery<Entites.Assessment>()
+            //     .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
+            var assessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
 
             var assessmentList = from assessment in assessments
                                  where assessment.Active.GetValueOrDefault(false)
@@ -155,19 +155,54 @@
         }
 
         /// <summary>
+        /// The GetAssessments.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IEnumerable{Assessment}}"/>.</returns>
+        public async Task<IEnumerable<Assessment>> GetAssessments(string schoolId, string classId, string studentId)
+        {
+            var dbAssessmentShare = await _tableStorage.GetAllAsync<Entites.AssessmentShare>("AssessmentShare");
+            var dbAssessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+            var studentAssessments = await GetStudentAssessments(schoolId, classId, studentId);
+
+            var studAssessmentIds = studentAssessments.Select(s => s.AssessmentId);
+
+            var assessments = from s in dbAssessmentShare.Where(d => d.PartitionKey == schoolId && d.ClassId == classId)
+                              join a in dbAssessments on s.AssessmentId equals a.RowKey
+
+                              orderby a.UpdatedOn descending
+                              where a.Active.GetValueOrDefault(false) && !studAssessmentIds.Contains(a.RowKey)
+                              select new Assessment
+                              {
+                                  Id = a.RowKey,
+                                  CreatedDate = a.Timestamp.DateTime,
+                                  AssessmentTitle = a.AssessmentTitle,
+                                  AssessmentDescription = a.AssessmentDescription,
+                                  AssessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(a.AssessmentQuiz, jsonSettings),
+                                  ClassId = s.ClassId,
+                                  SubjectName = a.SubjectName
+                              };
+            return assessments;
+        }
+
+        /// <summary>
         /// The GetStudentAssessments.
         /// </summary>
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <param name="studentId">The studentId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{StudentAssessment}}"/>.</returns>
-        public async Task<IEnumerable<StudentAssessment>> GetStudentAssessments(string schoolId, string classId)
+        public async Task<IEnumerable<StudentAssessment>> GetStudentAssessments(string schoolId, string classId, string studentId)
         {
             TableQuery<Entites.StudentAssessment> assessmentQuery = new TableQuery<Entites.StudentAssessment>()
                .Where(TableQuery.GenerateFilterCondition("ClassId", QueryComparisons.Equal, classId));
             var assessments = await _tableStorage.QueryAsync<Entites.StudentAssessment>("StudentAssessments", assessmentQuery);
 
             var assessmentList = from assessment in assessments
-                                 where assessment.Active.GetValueOrDefault(false)
+                                 where assessment.Active.GetValueOrDefault(false) &&
+                                        assessment.StudentId == studentId
                                  orderby assessment.UpdatedOn descending
                                  select new StudentAssessment
                                  {
@@ -175,12 +210,105 @@
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
                                      AssessmentAnswers = JsonConvert.DeserializeObject<List<Answer>>(assessment.AssessmentAnswers, jsonSettings),
-                                     Attempts = assessment.Attempts,
                                      StudentId = assessment.StudentId,
                                      StudentName = assessment.StudentName
                                  };
 
             return assessmentList;
+        }
+
+        /// <summary>
+        /// The UpdateAssessmentQuestion.
+        /// </summary>
+        /// <param name="model">The model<see cref="Question"/>.</param>
+        /// <param name="assessmentId">The assessmentId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task UpdateAssessmentQuestion(Question model, string assessmentId)
+        {
+            var assessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+            var assessment = assessments.SingleOrDefault(assessment => assessment.RowKey == assessmentId);
+
+            if (assessment != null)
+            {
+                var assessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(assessment.AssessmentQuiz, jsonSettings);
+
+                var question = assessmentQuestions != null ? assessmentQuestions.FirstOrDefault((ques) => ques.Id == model.Id) : null;
+
+                if (question != null)
+                {
+                    assessmentQuestions = assessmentQuestions
+                                        .Where(a => a.Id != model.Id)
+                                        .Select(r => r).ToList();
+
+                }
+                else
+                {
+                    var studentAssessmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+                    model.Id = studentAssessmentId;
+                }
+                if (assessmentQuestions == null)
+                {
+                    assessmentQuestions = new List<Question>();
+                }
+                assessmentQuestions.Add(model);
+
+                assessment.AssessmentQuiz = JsonConvert.SerializeObject(assessmentQuestions);
+                assessment.UpdatedOn = DateTime.UtcNow;
+
+                try
+                {
+                    await _tableStorage.UpdateAsync("Assessments", assessment);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("update assessment error: ", ex.InnerException);
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// The AssessmentShare.
+        /// </summary>
+        /// <param name="model">The model<see cref="AssessmentShare"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task AssessmentShare(AssessmentShare model)
+        {
+            // Create new content
+            var assessmentSharedId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+
+            var assessmentShare = new Entites.AssessmentShare(model.SchoolId, assessmentSharedId)
+            {
+                ClassId = model.ClassId,
+                AssessmentId = model.AssessmentId,
+                Active = true,
+                CreatedBy = model.CreatedBy,
+                UpdatedOn = DateTime.UtcNow,
+                UpdatedBy = model.CreatedBy,
+            };
+
+            try
+            {
+                await _tableStorage.AddAsync("AssessmentShare", assessmentShare);
+            }
+            catch (Exception ex)
+            {
+
+                throw new AppException("Assessment share error: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
+        /// The GetAssessmentSubjects.
+        /// </summary>
+        /// <returns>The <see cref="Task{List{string}}"/>.</returns>
+        public async Task<List<string>> GetAssessmentSubjects()
+        {
+            var dbAssessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+
+            return (from a in dbAssessments
+                    group a by a.SubjectName into s
+                    select s.Key).ToList();
         }
     }
 }

@@ -56,6 +56,8 @@
         /// </summary>
         private readonly IContentService _contentService;
 
+        private readonly IAssessmentService _assessmentService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
@@ -70,6 +72,7 @@
             IMapper mapper,
             IStudentService studentService,
             IClassService classService,
+            IAssessmentService assessmentService,
             IContentService contentService)
         {
             _tableStorage = tableStorage;
@@ -78,6 +81,7 @@
             _studentService = studentService;
             _classService = classService;
             _contentService = contentService;
+            _assessmentService = assessmentService;
         }
 
         /// <summary>
@@ -105,6 +109,7 @@
 
             var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
             var courseContent = await _contentService.GetAll();
+            var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
 
             var response = new AuthenticateResponse
             {
@@ -115,6 +120,7 @@
                 Role = account.Role,
                 Schools = schools.ToList(),
                 CourseContent = courseContent.ToList(),
+                AssessmentCategory = assessmentCategories,
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
