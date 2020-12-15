@@ -7,7 +7,7 @@
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
-    using System.Linq; 
+    using System.Linq;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -36,7 +36,7 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateStudentAssigments(StudentAssignment model)
         {
-           
+
 
             var studentAssignment = await _tableStorage.GetAllAsync<Entites.StudentAssignment>("StudentAssignment");
             var content = studentAssignment.SingleOrDefault(assignment => assignment.RowKey == model.Id);
@@ -68,7 +68,7 @@
                     AssignmentURL = model.AssignmentURL,
                     ReviewStatus = AssignmentReviewStatus.UnderReview,
 
-                Active = true,
+                    Active = true,
                     CreatedBy = model.StudentId,
                     UpdatedOn = DateTime.UtcNow,
                     UpdatedBy = model.StudentId,
@@ -92,29 +92,51 @@
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task CreateTeacherAssigments(TeacherAssignment model)
         {
-            var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+            var assignments = await _tableStorage.GetAllAsync<Entites.Assignment>("Assignment");
+            var content = assignments.SingleOrDefault(assignment => assignment.RowKey == model.Id);
 
-            var assignment = new Entites.Assignment(model.SchoolId, assignmentId)
+            if (content != null)
             {
+                content.Active = model.Active;
+                content.UpdatedOn = DateTime.UtcNow;
+                content.UpdatedBy = model.CreatedBy;
 
-                AssignmentName = model.AssignmentName,
-                AssignmentDescription = model.AssignmentDescription,
-                AssignmentURL = model.AssignmentURL,
-                ClassId = model.ClassId,
-                SubjectName = model.SubjectName,
+                try
+                {
+                    await _tableStorage.UpdateAsync("Assignment", content);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Update assignment error: ", ex.InnerException);
+                }
 
-                Active = true,
-                CreatedBy = model.CreatedBy,
-                UpdatedOn = DateTime.UtcNow,
-                UpdatedBy = model.CreatedBy,
-            };
-            try
-            {
-                await _tableStorage.AddAsync("Assignment", assignment);
             }
-            catch (Exception ex)
+            else
             {
-                throw new AppException("Create teacher assignments error: ", ex.InnerException);
+                var assignmentId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
+
+                var assignment = new Entites.Assignment(model.SchoolId, assignmentId)
+                {
+
+                    AssignmentName = model.AssignmentName,
+                    AssignmentDescription = model.AssignmentDescription,
+                    AssignmentURL = model.AssignmentURL,
+                    ClassId = model.ClassId,
+                    SubjectName = model.SubjectName,
+
+                    Active = true,
+                    CreatedBy = model.CreatedBy,
+                    UpdatedOn = DateTime.UtcNow,
+                    UpdatedBy = model.CreatedBy,
+                };
+                try
+                {
+                    await _tableStorage.AddAsync("Assignment", assignment);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Create assignment error: ", ex.InnerException);
+                }
             }
         }
 

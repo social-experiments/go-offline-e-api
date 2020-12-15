@@ -40,8 +40,8 @@ namespace goOfflineE.Functions
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AssigmentTeacherCreateUpdate")]
         public async Task<IActionResult> TeacherAssignment(
-          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assignment/teacher")]
-            [RequestBodyType(typeof(TeacherAssignment), "Create/update teacher assignment")] HttpRequest request)
+          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assignment/create")]
+            [RequestBodyType(typeof(TeacherAssignment), "Create/update assignment")] HttpRequest request)
         {
             var validateStatus = base.AuthorizationStatus(request);
             if (validateStatus != System.Net.HttpStatusCode.Accepted)
@@ -54,7 +54,7 @@ namespace goOfflineE.Functions
 
             await _assignmentService.CreateTeacherAssigments(requestData);
 
-            return new OkObjectResult(new { message = "Teacher assignment created successfull." });
+            return new OkObjectResult(new { message = "Assignment created successfull." });
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace goOfflineE.Functions
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AssigmentStudentCreateUpdate")]
         public async Task<IActionResult> StudentAssignment(
-          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assignment/student")]
-            [RequestBodyType(typeof(StudentAssignment), "Create/update student assignment")] HttpRequest request)
+          [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "assignment/submit")]
+            [RequestBodyType(typeof(StudentAssignment), "Submit student assignment")] HttpRequest request)
         {
             var validateStatus = base.AuthorizationStatus(request);
             if (validateStatus != System.Net.HttpStatusCode.Accepted)
@@ -78,15 +78,15 @@ namespace goOfflineE.Functions
 
             await _assignmentService.CreateStudentAssigments(requestData);
 
-            return new OkObjectResult(new { message = "Student assignment created successfull." });
+            return new OkObjectResult(new { message = "Student assignment submited successfull." });
         }
 
         /// <summary>
         /// The AssignmentList.
         /// </summary>
         /// <param name="req">The req<see cref="HttpRequest"/>.</param>
-        /// <param name="className">The className<see cref="string"/>.</param>
-        /// <param name="subjectName">The subjectName<see cref="string"/>.</param>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [FunctionName("AssignmentList")]
         [OpenApiOperation("List", "Assignment")]
