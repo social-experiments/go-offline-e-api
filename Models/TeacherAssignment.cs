@@ -8,11 +8,14 @@
     /// </summary>
     public class TeacherAssignment
     {
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TeacherAssignment"/> class.
+        /// </summary>
         public TeacherAssignment()
         {
             this.StudentAssignments = new List<StudentAssignment>();
         }
+
         /// <summary>
         /// Gets or sets the Id.
         /// </summary>
@@ -58,9 +61,14 @@
         /// </summary>
         public string AssignmentURL { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Active.
+        /// </summary>
+        public bool? Active { set; get; }
+
+        /// <summary>
+        /// Gets or sets the StudentAssignments.
+        /// </summary>
         public List<StudentAssignment> StudentAssignments { get; set; }
-
-
-
     }
 }

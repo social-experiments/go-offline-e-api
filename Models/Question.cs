@@ -20,7 +20,7 @@
         /// <summary>
         /// Gets or sets the QuestionOptions.
         /// </summary>
-        public List<Dictionary<int, string>> QuestionOptions { get; set; }
+        public Dictionary<int, string> QuestionOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the QuestionType.
@@ -28,8 +28,13 @@
         public string QuestionType { get; set; }
 
         /// <summary>
-        /// Gets or sets the Answer.
+        /// Gets or sets the OptionAnswer.
         /// </summary>
-        public string Answer { get; set; }
+        public int OptionAnswer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ShortAnswer.
+        /// </summary>
+        public string ShortAnswer { get; set; }
     }
 }

@@ -168,23 +168,34 @@
                 _log.LogInformation($"Start DetectWithUrlAsync");
 
                 IList<DetectedFace> faceList =
-                    await _faceClient.Face.DetectWithUrlAsync(blobUriBuilder.Uri.AbsoluteUri, recognitionModel: RecognitionModel.Recognition01).ConfigureAwait(false);
+                    await _faceClient.Face.DetectWithUrlAsync(blobUriBuilder.Uri.AbsoluteUri, true, true, recognitionModel: "recognition_01", returnRecognitionModel: true).ConfigureAwait(false);
 
                 _log.LogInformation($"End DetectWithUrlAsync: { faceList}");
 
+                
+                var detectedFaceGroups = faceList
+                              .Select((face, i) => new { DetectedFace = face.FaceId.Value, Index = i })
+                              .GroupBy(x => x.Index / 10, x => x.DetectedFace);
 
-                IList<Guid?> faceIds = faceList.Select(face => face.FaceId).ToArray();
-                _log.LogInformation($"faceIds : { faceIds}");
+                List<IdentifyResult> IdentifyResults = new List<IdentifyResult>();
 
-                _log.LogInformation($"Start IdentifyAsync");
+                foreach (var face in detectedFaceGroups)
+                {
+                    List<Guid?> sourceFaceIds = new List<Guid?>();
 
-                var results = await _faceClient.Face.IdentifyAsync(faceIds, queueDataMessage.SchoolId, null, 1, 0.5).ConfigureAwait(false);
+                    foreach (var detectedFace in face)
+                    {
+                        sourceFaceIds.Add(detectedFace);
+                    }
 
-                _log.LogInformation($"End results");
+                    var identifiedResult = await _faceClient.Face.IdentifyAsync(sourceFaceIds, queueDataMessage.SchoolId).ConfigureAwait(false);
+
+                    IdentifyResults.AddRange(identifiedResult);
+                }
 
                 IList<string> presentStudetns = new List<string>();
 
-                foreach (var identifyResult in results)
+                foreach (var identifyResult in IdentifyResults)
                 {
                     _log.LogInformation($"identifyResult = {identifyResult}");
 
@@ -229,8 +240,9 @@
 
                     await _tableStorage.AddAsync("Attentdance", attaintance);
 
-                    _log.LogInformation($" Done Attentdance AddAsync: {attaintance}");
+                    _log.LogInformation($"Done Attentdance AddAsync: {attaintance}");
                 }
+                _log.LogInformation($"Done Attentdance..");
             }
             // Catch and display Face API errors.
             catch (APIErrorException ex)
