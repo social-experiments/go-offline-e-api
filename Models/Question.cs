@@ -36,5 +36,10 @@
         /// Gets or sets the ShortAnswer.
         /// </summary>
         public string ShortAnswer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Active.
+        /// </summary>
+        public bool? Active { set; get; }
     }
 }

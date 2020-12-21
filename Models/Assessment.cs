@@ -14,6 +14,7 @@
         public Assessment()
         {
             this.AssessmentQuestions = new List<Question>();
+            this.StudentAssessments = new List<StudentAssessment>();
         }
 
         /// <summary>
@@ -65,5 +66,10 @@
         /// Gets or sets the AssessmentQuestions.
         /// </summary>
         public List<Question> AssessmentQuestions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the StudentAssessments.
+        /// </summary>
+        public List<StudentAssessment> StudentAssessments { get; set; }
     }
 }

@@ -51,10 +51,14 @@
         /// </summary>
         public DateTime CreatedDate { get; set; }
 
-        
         /// <summary>
         /// Gets or sets the AssessmentAnswers.
         /// </summary>
         public List<Answer> AssessmentAnswers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Active.
+        /// </summary>
+        public bool? Active { set; get; }
     }
 }
