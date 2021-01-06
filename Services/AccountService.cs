@@ -358,5 +358,39 @@
         {
             throw new NotImplementedException();
         }
+
+        public async Task RefreshPushNotificationToken(PushNotificationToken token)
+        {
+            try
+            {
+                if (token.Role == Role.Student.ToString())
+                {
+                    var students = await _tableStorage.GetAllAsync<Student>("Student");
+                    var student = students.SingleOrDefault(s => s.RowKey == token.Id);
+
+                    student.NotificationToken = token.RefreshToken;
+                    student.UpdatedOn = DateTime.UtcNow;
+                    student.UpdatedBy = token.Id;
+
+                    await _tableStorage.UpdateAsync("Student", student);
+                }
+                else
+                {
+                    var users = await _tableStorage.GetAllAsync<User>("User");
+                    var user = users.SingleOrDefault(u => u.RowKey == token.Id);
+
+                    user.NotificationToken = token.RefreshToken;
+                    user.UpdatedOn = DateTime.UtcNow;
+                    user.UpdatedBy = token.Id;
+
+                    await _tableStorage.UpdateAsync("User", user);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Error: Refresh push notification token ", ex.InnerException);
+            }
+           
+        }
     }
 }

@@ -69,6 +69,21 @@
         public static string WebSiteUrl => Environment.GetEnvironmentVariable("WEB_SITE");
 
         /// <summary>
+        /// Gets the PushNotificationServerKey.
+        /// </summary>
+        public static string PushNotificationServerKey => Environment.GetEnvironmentVariable("PUSH_NOTIFICATION_SERVER_KEY");
+
+        /// <summary>
+        /// Gets the PushNotificationSenderId.
+        /// </summary>
+        public static string PushNotificationSenderId => Environment.GetEnvironmentVariable("PUSH_NOTIFICATION_SENDER_ID");
+
+        /// <summary>
+        /// Gets the PushNotificationApi.
+        /// </summary>
+        public static string PushNotificationApi => Environment.GetEnvironmentVariable("PUSH_NOTIFICATION_API");
+
+        /// <summary>
         /// The GetRandomPassword.
         /// </summary>
         /// <param name="length">The length<see cref="int"/>.</param>

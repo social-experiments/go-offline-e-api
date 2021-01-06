@@ -21,12 +21,19 @@
         private readonly ITableStorage _tableStorage;
 
         /// <summary>
+        /// Defines the _pushNotificationService.
+        /// </summary>
+        private readonly IPushNotificationService _pushNotificationService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AssignmentService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
-        public AssignmentService(ITableStorage tableStorage)
+        /// <param name="pushNotificationService">The pushNotificationService<see cref="IPushNotificationService"/>.</param>
+        public AssignmentService(ITableStorage tableStorage, IPushNotificationService pushNotificationService)
         {
             _tableStorage = tableStorage;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -77,6 +84,7 @@
                 try
                 {
                     await _tableStorage.AddAsync("StudentAssignment", assignment);
+                    await SendPushNotificationToTeacher(model);
                 }
                 catch (Exception ex)
                 {
@@ -132,6 +140,7 @@
                 try
                 {
                     await _tableStorage.AddAsync("Assignment", assignment);
+                    await SendPushNotificationToStudent(model);
                 }
                 catch (Exception ex)
                 {
@@ -185,5 +194,72 @@
 
             return assignmentList;
         }
+
+        /// <summary>
+        /// The SendPushNotificationToStudent.
+        /// </summary>
+        /// <param name="assignment">The assignment<see cref="TeacherAssignment"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task SendPushNotificationToStudent(TeacherAssignment assignment)
+        {
+            try
+            {
+                var pushNotification = new PushNotification
+                {
+                    Title = assignment.SubjectName,
+                    Body = assignment.AssignmentName
+                };
+
+                var studentData = await _tableStorage.GetAllAsync<Entites.Student>("Student");
+                var students = studentData.Where(s => s.PartitionKey == assignment.SchoolId && s.ClassId == assignment.ClassId);
+                foreach (var student in students)
+                {
+                    if (!String.IsNullOrEmpty(student.NotificationToken))
+                    {
+                        pushNotification.RecipientDeviceToken = student.NotificationToken;
+                        await _pushNotificationService.SendAsync(pushNotification);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
+        /// The SendPushNotificationToTeacher.
+        /// </summary>
+        /// <param name="studAssignment">The studAssignment<see cref="StudentAssignment"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task SendPushNotificationToTeacher(StudentAssignment studAssignment)
+        {
+            try
+            {
+                var assignments = await _tableStorage.GetAllAsync<Entites.Assignment>("Assignment");
+                var assignment = assignments.SingleOrDefault(assignment => assignment.RowKey == studAssignment.AssignmentId);
+
+                var pushNotification = new PushNotification
+                {
+                    Title = studAssignment.StudentName, 
+                    Body = $"Upload assignment: {assignment.AssignmentName}"
+                };
+
+                var userData = await _tableStorage.GetAllAsync<Entites.User>("User");
+                var user = userData.FirstOrDefault(s => s.RowKey == assignment.CreatedBy);
+                if (!String.IsNullOrEmpty(user.NotificationToken))
+                {
+                    pushNotification.RecipientDeviceToken = user.NotificationToken;
+                    await _pushNotificationService.SendAsync(pushNotification);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
+
     }
+}
 }

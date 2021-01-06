@@ -112,5 +112,23 @@ namespace goOfflineE.Functions
 
             return new OkObjectResult(response);
         }
+
+        /// <summary>
+        /// The RefreshPushNotification.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("RefreshPushNotification")]
+        public async Task<IActionResult> RefreshPushNotification(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "refresh/notification/token")]
+            [RequestBodyType(typeof(PushNotificationToken), "Refresh push notification token request")] HttpRequest request)
+        {
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            PushNotificationToken requestData = JsonConvert.DeserializeObject<PushNotificationToken>(requestBody);
+
+            await _accountService.RefreshPushNotificationToken(requestData);
+
+            return new OkObjectResult(new { message = "Refresh token successfully." });
+        }
     }
 }

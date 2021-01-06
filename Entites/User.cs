@@ -74,5 +74,10 @@
         /// Gets or sets a value indicating whether ForceChangePasswordNextLogin.
         /// </summary>
         public bool ForceChangePasswordNextLogin { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NotificationToken.
+        /// </summary>
+        public string NotificationToken { get; set; }
     }
 }

@@ -31,6 +31,10 @@
     "CognitiveServiceKey": "c8a46adf54034657b1689a9eec153235",
     "CognitiveServiceEndPoint": "https://goofflinee.cognitiveservices.azure.com/",
 
+    "PUSH_NOTIFICATION_SERVER_KEY": "key=AAAAxxPwlhA:APA91bHiw6zrCQf9tosNUTj-AIacgMUmC2bvFnhMtSWJuV5wxfuioIcrMYRPbULYKwIodR8qGdiIGd_izFKml_ovcTqPw5AtQERXZuZbz1ahdHOuomwUCyL8PMi_UTA04UgqfxAtm0qn",
+    "PUSH_NOTIFICATION_SENDER_ID": "855033026064",
+    "PUSH_NOTIFICATION_API": "https://fcm.googleapis.com/fcm/send",
+
     "OpenApi__Info__Version": "2.0.0",
     "OpenApi__Info__Title": "goOfflineE Azure Function API",
     "OpenApi__Info__Description": "A sample API that runs on Azure Functions either 1.x or 2.x using Open API specification.",
