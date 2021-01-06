@@ -106,6 +106,11 @@
         public string ProfileStoragePath { get; set; }
 
         /// <summary>
+        /// Gets or sets the NotificationToken.
+        /// </summary>
+        public string NotificationToken { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether TrainStudentModel.
         /// </summary>
         public bool TrainStudentModel { get; set; }

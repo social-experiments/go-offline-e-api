@@ -79,6 +79,19 @@
         /// <returns>The <see cref="Task"/>.</returns>
         Task Delete(string id);
 
+        /// <summary>
+        /// The RefreshPushNotificationToken.
+        /// </summary>
+        /// <param name="token">The token<see cref="PushNotificationToken"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task RefreshPushNotificationToken(PushNotificationToken token);
+
+        /// <summary>
+        /// The SyncData.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{AuthenticateResponse}"/>.</returns>
         Task<AuthenticateResponse> SyncData(string schoolId = null, string classId = null);
     }
 }
