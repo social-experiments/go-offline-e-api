@@ -107,22 +107,24 @@
                 // Train the PersonGroup
                 await _faceClient.PersonGroup.TrainAsync(queueDataMessage.SchoolId).ConfigureAwait(false);
 
-                while (true)
-                {
-                    Task.Delay(1000).Wait();
-                    var status = await _faceClient.LargeFaceList.GetTrainingStatusAsync(queueDataMessage.SchoolId);
+                //while (true)
+                //{
+                //    Task.Delay(1000).Wait();
+                //    var status = await _faceClient.LargeFaceList.GetTrainingStatusAsync(queueDataMessage.SchoolId);
 
-                    if (status.Status == TrainingStatusType.Running)
-                    {
-                        _log.LogInformation($"Training Running status ({queueDataMessage.StudentId}): {status.Status}");
-                        continue;
-                    }
-                    else if (status.Status == TrainingStatusType.Succeeded)
-                    {
-                        _log.LogInformation($"Training Succeeded status ({queueDataMessage.StudentId}): {status.Status}");
-                        break;
-                    }
-                }
+                //    if (status.Status == TrainingStatusType.Running)
+                //    {
+                //        _log.LogInformation($"Training Running status ({queueDataMessage.StudentId}): {status.Status}");
+                //        continue;
+                //    }
+                //    else if (status.Status == TrainingStatusType.Succeeded)
+                //    {
+                //        _log.LogInformation($"Training Succeeded status ({queueDataMessage.StudentId}): {status.Status}");
+                //        break;
+                //    }
+                //}
+
+                Task.Delay(1000).Wait();
 
                 await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs);
 
