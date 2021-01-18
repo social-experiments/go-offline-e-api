@@ -38,6 +38,11 @@
         public string ShortAnswer { get; set; }
 
         /// <summary>
+        /// Gets or sets the QuestionImagePath.
+        /// </summary>
+        public string QuestionImagePath { get; set; }
+
+        /// <summary>
         /// Gets or sets the Active.
         /// </summary>
         public bool? Active { set; get; }
