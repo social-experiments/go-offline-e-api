@@ -73,6 +73,8 @@
             _log.LogInformation($"TrainStudentModel: {queueDataMessage.StudentId}");
             CreateGroup(queueDataMessage.SchoolId, _log);
 
+            var pictureURLs = new List<string>();
+
             try
             {
 
@@ -97,9 +99,16 @@
                     };
                     _log.LogInformation($"blobUriBuilder { blobUriBuilder.Uri.AbsoluteUri}");
 
-                    await _faceClient.PersonGroupPerson.AddFaceFromUrlAsync(queueDataMessage.SchoolId, student.PersonId, blobUriBuilder.Uri.AbsoluteUri, detectionModel: DetectionModel.Detection01);
-                    _log.LogInformation($"AddFaceFromUrlAsync Done");
-
+                    try
+                    {
+                        await _faceClient.PersonGroupPerson.AddFaceFromUrlAsync(queueDataMessage.SchoolId, student.PersonId, blobUriBuilder.Uri.AbsoluteUri, detectionModel: DetectionModel.Detection01);
+                        pictureURLs.Add(blobUri);
+                        _log.LogInformation($"AddFaceFromUrlAsync Done");
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.LogError(ex, $"AddFaceFromUrlAsync APIErrorException: {queueDataMessage.StudentId} URI: {blobUriBuilder.Uri.AbsoluteUri}");
+                    }
                 }
 
                 _log.LogInformation($"Train the PersonGroup Start {queueDataMessage.SchoolId}");
@@ -126,7 +135,7 @@
 
                 Task.Delay(1000).Wait();
 
-                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs);
+                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, pictureURLs);
 
                 _log.LogInformation($"Train the PersonGroup Done {queueDataMessage.SchoolId}: {queueDataMessage.StudentId}");
             }
