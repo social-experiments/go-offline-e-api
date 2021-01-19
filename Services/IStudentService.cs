@@ -25,6 +25,12 @@
         Task<IEnumerable<StudentResponse>> GetAll(string schoolId, string classId);
 
         /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{StudentResponse}}"/>.</returns>
+        Task<IEnumerable<StudentResponse>> GetAll();
+
+        /// <summary>
         /// The UpdateStatusToTrainStudentModel.
         /// </summary>
         /// <param name="studentId">The studentId<see cref="string"/>.</param>

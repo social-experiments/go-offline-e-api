@@ -2,6 +2,7 @@
 {
     using goOfflineE.Models;
     using Microsoft.Extensions.Logging;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -24,5 +25,11 @@
         /// <param name="log">The log<see cref="ILogger"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task ProcessAttendance(QueueDataMessage queueDataMessage, ILogger log);
+
+        /// <summary>
+        /// The GetAttentdance.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{AttentdanceResponse}}"/>.</returns>
+        Task<IEnumerable<AttentdanceResponse>> GetAttentdance();
     }
 }

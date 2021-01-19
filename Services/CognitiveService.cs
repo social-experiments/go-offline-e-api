@@ -183,7 +183,7 @@
 
                 _log.LogInformation($"End DetectWithUrlAsync: { faceList}");
 
-                
+
                 var detectedFaceGroups = faceList
                               .Select((face, i) => new { DetectedFace = face.FaceId.Value, Index = i })
                               .GroupBy(x => x.Index / 10, x => x.DetectedFace);
@@ -310,6 +310,31 @@
             {
                 _log.LogInformation($"Already Created : {personGroupId}");
             }
+        }
+
+        /// <summary>
+        /// The GetAttentdance.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{AttentdanceResponse}}"/>.</returns>
+        public async Task<IEnumerable<AttentdanceResponse>> GetAttentdance()
+        {
+            var attentdance = await _tableStorage.GetAllAsync<Entites.Attentdance>("Attentdance");
+
+            var attentdanceList = from attent in attentdance
+                                  orderby attent.UpdatedOn descending
+                                  select new AttentdanceResponse
+                                  {
+                                      Id = attent.RowKey,
+                                      SchoolId = attent.PartitionKey,
+                                      StudentId = attent.StudentId,
+                                      ClassRoomId = attent.ClassRoomId,
+                                      TeacherId = attent.TeacherId,
+                                      Latitude = attent.Latitude,
+                                      Longitude = attent.Longitude,
+                                      Present = attent.Present
+                                  };
+
+            return attentdanceList;
         }
     }
 }
