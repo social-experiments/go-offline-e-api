@@ -1,27 +1,14 @@
-﻿namespace goOfflineE.Entites
+﻿namespace goOfflineE.Models
 {
     /// <summary>
-    /// Defines the <see cref="Attentdance" />.
+    /// Defines the <see cref="AttentdanceResponse" />.
     /// </summary>
-    public class Attentdance : BaseEntity
+    public class AttentdanceResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Attentdance"/> class.
+        /// Gets or sets the Id.
         /// </summary>
-        public Attentdance()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Attentdance"/> class.
-        /// </summary>
-        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
-        /// <param name="studentId">The studentId<see cref="string"/>.</param>
-        public Attentdance(string schoolId, string attentdanceId)
-        {
-            this.PartitionKey = schoolId;
-            this.RowKey = attentdanceId;
-        }
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets or sets the ClassRoomId.
@@ -32,6 +19,11 @@
         /// Gets or sets the StudentId.
         /// </summary>
         public string StudentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SchoolId.
+        /// </summary>
+        public string SchoolId { get; set; }
 
         /// <summary>
         /// Gets or sets the CourseId.

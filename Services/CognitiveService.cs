@@ -73,6 +73,8 @@
             _log.LogInformation($"TrainStudentModel: {queueDataMessage.StudentId}");
             CreateGroup(queueDataMessage.SchoolId, _log);
 
+            var pictureURLs = new List<string>();
+
             try
             {
 
@@ -97,9 +99,16 @@
                     };
                     _log.LogInformation($"blobUriBuilder { blobUriBuilder.Uri.AbsoluteUri}");
 
-                    await _faceClient.PersonGroupPerson.AddFaceFromUrlAsync(queueDataMessage.SchoolId, student.PersonId, blobUriBuilder.Uri.AbsoluteUri, detectionModel: DetectionModel.Detection01);
-                    _log.LogInformation($"AddFaceFromUrlAsync Done");
-
+                    try
+                    {
+                        await _faceClient.PersonGroupPerson.AddFaceFromUrlAsync(queueDataMessage.SchoolId, student.PersonId, blobUriBuilder.Uri.AbsoluteUri, detectionModel: DetectionModel.Detection01);
+                        pictureURLs.Add(blobUri);
+                        _log.LogInformation($"AddFaceFromUrlAsync Done");
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.LogError(ex, $"AddFaceFromUrlAsync APIErrorException: {queueDataMessage.StudentId} URI: {blobUriBuilder.Uri.AbsoluteUri}");
+                    }
                 }
 
                 _log.LogInformation($"Train the PersonGroup Start {queueDataMessage.SchoolId}");
@@ -107,24 +116,26 @@
                 // Train the PersonGroup
                 await _faceClient.PersonGroup.TrainAsync(queueDataMessage.SchoolId).ConfigureAwait(false);
 
-                while (true)
-                {
-                    Task.Delay(1000).Wait();
-                    var status = await _faceClient.LargeFaceList.GetTrainingStatusAsync(queueDataMessage.SchoolId);
+                //while (true)
+                //{
+                //    Task.Delay(1000).Wait();
+                //    var status = await _faceClient.LargeFaceList.GetTrainingStatusAsync(queueDataMessage.SchoolId);
 
-                    if (status.Status == TrainingStatusType.Running)
-                    {
-                        _log.LogInformation($"Training Running status ({queueDataMessage.StudentId}): {status.Status}");
-                        continue;
-                    }
-                    else if (status.Status == TrainingStatusType.Succeeded)
-                    {
-                        _log.LogInformation($"Training Succeeded status ({queueDataMessage.StudentId}): {status.Status}");
-                        break;
-                    }
-                }
+                //    if (status.Status == TrainingStatusType.Running)
+                //    {
+                //        _log.LogInformation($"Training Running status ({queueDataMessage.StudentId}): {status.Status}");
+                //        continue;
+                //    }
+                //    else if (status.Status == TrainingStatusType.Succeeded)
+                //    {
+                //        _log.LogInformation($"Training Succeeded status ({queueDataMessage.StudentId}): {status.Status}");
+                //        break;
+                //    }
+                //}
 
-                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, queueDataMessage.PictureURLs);
+                Task.Delay(1000).Wait();
+
+                await _studentService.UpdateStudentProfile(queueDataMessage.StudentId, pictureURLs);
 
                 _log.LogInformation($"Train the PersonGroup Done {queueDataMessage.SchoolId}: {queueDataMessage.StudentId}");
             }
@@ -172,7 +183,7 @@
 
                 _log.LogInformation($"End DetectWithUrlAsync: { faceList}");
 
-                
+
                 var detectedFaceGroups = faceList
                               .Select((face, i) => new { DetectedFace = face.FaceId.Value, Index = i })
                               .GroupBy(x => x.Index / 10, x => x.DetectedFace);
@@ -299,6 +310,31 @@
             {
                 _log.LogInformation($"Already Created : {personGroupId}");
             }
+        }
+
+        /// <summary>
+        /// The GetAttentdance.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{AttentdanceResponse}}"/>.</returns>
+        public async Task<IEnumerable<AttentdanceResponse>> GetAttentdance()
+        {
+            var attentdance = await _tableStorage.GetAllAsync<Entites.Attentdance>("Attentdance");
+
+            var attentdanceList = from attent in attentdance
+                                  orderby attent.UpdatedOn descending
+                                  select new AttentdanceResponse
+                                  {
+                                      Id = attent.RowKey,
+                                      SchoolId = attent.PartitionKey,
+                                      StudentId = attent.StudentId,
+                                      ClassRoomId = attent.ClassRoomId,
+                                      TeacherId = attent.TeacherId,
+                                      Latitude = attent.Latitude,
+                                      Longitude = attent.Longitude,
+                                      Present = attent.Present
+                                  };
+
+            return attentdanceList;
         }
     }
 }

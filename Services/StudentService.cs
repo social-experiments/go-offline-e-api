@@ -202,6 +202,39 @@
         }
 
         /// <summary>
+        /// The GetAll.
+        /// </summary>
+        /// <returns>The <see cref="Task{IEnumerable{StudentResponse}}"/>.</returns>
+        public async Task<IEnumerable<StudentResponse>> GetAll()
+        {
+            var students = await _tableStorage.GetAllAsync<Entites.Student>("Student");
+
+            var studentList = from student in students
+                              where student.Active.GetValueOrDefault(false)
+                              orderby student.UpdatedOn descending
+                              select new StudentResponse
+                              {
+                                  Id = student.RowKey,
+                                  FirstName = student.FirstName,
+                                  LastName = student.LastName,
+                                  EnrolmentNo = student.EnrolmentNo,
+                                  Address1 = student.Address1,
+                                  Address2 = student.Address2,
+                                  Country = student.Country,
+                                  State = student.State,
+                                  City = student.City,
+                                  Zip = student.Zip,
+                                  SchoolId = student.PartitionKey,
+                                  ClassId = student.ClassId,
+                                  Gender = student.Gender,
+                                  ProfileStoragePath = student.ProfileStoragePath,
+                                  TrainStudentModel = student.TrainStudentModel
+                              };
+
+            return studentList;
+        }
+
+        /// <summary>
         /// The UpdateStatusToTrainStudentModel.
         /// </summary>
         /// <param name="studentId">The studentId<see cref="string"/>.</param>
