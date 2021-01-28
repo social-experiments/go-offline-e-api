@@ -133,8 +133,7 @@
         /// <returns>The <see cref="Task{IEnumerable{Assessment}}"/>.</returns>
         public async Task<IEnumerable<Assessment>> GetAssessments(string schoolId)
         {
-            //TableQuery<Entites.Assessment> assessmentQuery = new TableQuery<Entites.Assessment>()
-            //     .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
+
             var dbAssessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
 
             var assessmentList = from assessment in dbAssessments
@@ -146,16 +145,19 @@
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentTitle = assessment.AssessmentTitle,
                                      AssessmentDescription = assessment.AssessmentDescription,
-                                     AssessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(assessment.AssessmentQuiz, jsonSettings),
+                                     Questions = assessment.AssessmentQuiz,
                                      ClassId = assessment.ClassId,
                                      SubjectName = assessment.SubjectName,
-                                     Active =  assessment.Active
+                                     Active = assessment.Active
                                  };
             List<Assessment> assessments = new List<Assessment>();
             foreach (var assessment in assessmentList)
             {
                 var studAssessment = (await GetStudentAssessments(schoolId, assessment.Id)).ToList();
-                var questions = assessment.AssessmentQuestions.Where(a => a.Active.GetValueOrDefault(false)).Select(a => a).ToList();
+                var assessmentQuestions = string.IsNullOrEmpty(assessment.Questions) ?
+                    new List<Question>() : JsonConvert.DeserializeObject<List<Question>>(assessment.Questions, jsonSettings);
+                var questions = assessmentQuestions.Where(a => a.Active.GetValueOrDefault(false)).Select(a => a).ToList();
+                assessment.Questions = "";
                 assessment.StudentAssessments.AddRange(studAssessment);
                 assessment.AssessmentQuestions.AddRange(questions);
                 assessments.Add(assessment);
@@ -179,22 +181,31 @@
 
             var studAssessmentIds = studentAssessments.Select(s => s.AssessmentId);
 
-            var assessments = from s in dbAssessmentShare.Where(d => d.PartitionKey == schoolId && d.ClassId == classId)
-                              join a in dbAssessments on s.AssessmentId equals a.RowKey
+            var assessmentList = from s in dbAssessmentShare.Where(d => d.PartitionKey == schoolId && d.ClassId == classId)
+                                 join a in dbAssessments on s.AssessmentId equals a.RowKey
 
-                              orderby a.UpdatedOn descending
-                              where a.Active.GetValueOrDefault(false) && !studAssessmentIds.Contains(a.RowKey)
-                              select new Assessment
-                              {
-                                  Id = a.RowKey,
-                                  CreatedDate = a.Timestamp.DateTime,
-                                  AssessmentTitle = a.AssessmentTitle,
-                                  AssessmentDescription = a.AssessmentDescription,
-                                  AssessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(a.AssessmentQuiz, jsonSettings),
-                                  ClassId = s.ClassId,
-                                  SubjectName = a.SubjectName,
-                                  Active = a.Active
-                              };
+                                 orderby a.UpdatedOn descending
+                                 where a.Active.GetValueOrDefault(false) && !studAssessmentIds.Contains(a.RowKey)
+                                 select new Assessment
+                                 {
+                                     Id = a.RowKey,
+                                     CreatedDate = a.Timestamp.DateTime,
+                                     AssessmentTitle = a.AssessmentTitle,
+                                     AssessmentDescription = a.AssessmentDescription,
+                                     Questions = a.AssessmentQuiz,
+                                     ClassId = s.ClassId,
+                                     SubjectName = a.SubjectName,
+                                     Active = a.Active
+                                 };
+            List<Assessment> assessments = new List<Assessment>();
+            foreach (var assessment in assessmentList)
+            {
+                var assessmentQuestions = string.IsNullOrEmpty(assessment.Questions) ?
+                   new List<Question>() : JsonConvert.DeserializeObject<List<Question>>(assessment.Questions, jsonSettings);
+                var questions = assessmentQuestions.Where(a => a.Active.GetValueOrDefault(false)).Select(a => a).ToList();
+                assessment.Questions = "";
+                assessment.AssessmentQuestions.AddRange(questions);
+            }
             return assessments;
         }
 
@@ -209,9 +220,9 @@
         {
             TableQuery<Entites.StudentAssessment> assessmentQuery = new TableQuery<Entites.StudentAssessment>()
                .Where(TableQuery.GenerateFilterCondition("ClassId", QueryComparisons.Equal, classId));
-            var assessments = await _tableStorage.QueryAsync<Entites.StudentAssessment>("StudentAssessments", assessmentQuery);
+            var assessmentDB = await _tableStorage.QueryAsync<Entites.StudentAssessment>("StudentAssessments", assessmentQuery);
 
-            var assessmentList = from assessment in assessments
+            var assessmentList = from assessment in assessmentDB
                                  where assessment.Active.GetValueOrDefault(false) &&
                                         assessment.StudentId == studentId
                                  orderby assessment.UpdatedOn descending
@@ -220,13 +231,22 @@
                                      Id = assessment.RowKey,
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
-                                     AssessmentAnswers = JsonConvert.DeserializeObject<List<Answer>>(assessment.AssessmentAnswers, jsonSettings),
+                                     Answers = assessment.AssessmentAnswers,
                                      StudentId = assessment.StudentId,
                                      StudentName = assessment.StudentName,
                                      Active = assessment.Active
                                  };
 
-            return assessmentList;
+            List<StudentAssessment> assessments = new List<StudentAssessment>();
+            foreach (var assessment in assessmentList)
+            {
+                var assessmentQuestions = string.IsNullOrEmpty(assessment.Answers) ?
+                   new List<Answer>() : JsonConvert.DeserializeObject<List<Answer>>(assessment.Answers, jsonSettings);
+                var questions = assessmentQuestions.Select(a => a).ToList();
+                assessment.Answers = "";
+                assessment.AssessmentAnswers.AddRange(questions);
+            }
+            return assessments;
         }
 
         /// <summary>
@@ -242,7 +262,7 @@
 
             if (assessment != null)
             {
-                var assessmentQuestions = JsonConvert.DeserializeObject<List<Question>>(assessment.AssessmentQuiz, jsonSettings);
+                var assessmentQuestions = assessment.AssessmentQuiz != null ? JsonConvert.DeserializeObject<List<Question>>(assessment.AssessmentQuiz, jsonSettings) : null;
 
                 var question = assessmentQuestions != null ? assessmentQuestions.FirstOrDefault((ques) => ques.Id == model.Id) : null;
 
@@ -333,9 +353,9 @@
         {
             TableQuery<Entites.StudentAssessment> assessmentQuery = new TableQuery<Entites.StudentAssessment>()
                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
-            var assessments = await _tableStorage.QueryAsync<Entites.StudentAssessment>("StudentAssessments", assessmentQuery);
+            var assessmentDB = await _tableStorage.QueryAsync<Entites.StudentAssessment>("StudentAssessments", assessmentQuery);
 
-            var assessmentList = from assessment in assessments
+            var assessmentList = from assessment in assessmentDB
                                  where assessment.Active.GetValueOrDefault(false) && assessment.AssessmentId == assessmentId
                                  orderby assessment.UpdatedOn descending
                                  select new StudentAssessment
@@ -343,13 +363,22 @@
                                      Id = assessment.RowKey,
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
-                                     AssessmentAnswers = JsonConvert.DeserializeObject<List<Answer>>(assessment.AssessmentAnswers, jsonSettings),
+                                     Answers = assessment.AssessmentAnswers,
                                      StudentId = assessment.StudentId,
                                      StudentName = assessment.StudentName,
                                      ClassId = assessment.ClassId
                                  };
 
-            return assessmentList;
+            List<StudentAssessment> assessments = new List<StudentAssessment>();
+            foreach (var assessment in assessmentList)
+            {
+                var assessmentQuestions = string.IsNullOrEmpty(assessment.Answers) ?
+                   new List<Answer>() : JsonConvert.DeserializeObject<List<Answer>>(assessment.Answers, jsonSettings);
+                var questions = assessmentQuestions.Select(a => a).ToList();
+                assessment.Answers = "";
+                assessment.AssessmentAnswers.AddRange(questions);
+            }
+            return assessments;
         }
     }
 }

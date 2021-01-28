@@ -1,5 +1,7 @@
 ﻿namespace goOfflineE.Entites
 {
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Defines the <see cref="Assessment" />.
     /// </summary>
@@ -36,6 +38,7 @@
         /// <summary>
         /// Gets or sets the AssessmentQuiz.
         /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string AssessmentQuiz { get; set; }
 
         /// <summary>

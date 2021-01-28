@@ -68,6 +68,11 @@
         public List<Question> AssessmentQuestions { get; set; }
 
         /// <summary>
+        /// Gets or sets the Questions.
+        /// </summary>
+        public string Questions { get; set; }
+
+        /// <summary>
         /// Gets or sets the StudentAssessments.
         /// </summary>
         public List<StudentAssessment> StudentAssessments { get; set; }
