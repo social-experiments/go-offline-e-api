@@ -205,6 +205,7 @@
                 var questions = assessmentQuestions.Where(a => a.Active.GetValueOrDefault(false)).Select(a => a).ToList();
                 assessment.Questions = "";
                 assessment.AssessmentQuestions.AddRange(questions);
+                assessments.Add(assessment);
             }
             return assessments;
         }
@@ -245,6 +246,7 @@
                 var questions = assessmentQuestions.Select(a => a).ToList();
                 assessment.Answers = "";
                 assessment.AssessmentAnswers.AddRange(questions);
+                assessments.Add(assessment);
             }
             return assessments;
         }
@@ -377,6 +379,7 @@
                 var questions = assessmentQuestions.Select(a => a).ToList();
                 assessment.Answers = "";
                 assessment.AssessmentAnswers.AddRange(questions);
+                assessments.Add(assessment);
             }
             return assessments;
         }
