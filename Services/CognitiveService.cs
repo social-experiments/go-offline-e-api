@@ -331,7 +331,8 @@
                                       TeacherId = attent.TeacherId,
                                       Latitude = attent.Latitude,
                                       Longitude = attent.Longitude,
-                                      Present = attent.Present
+                                      Present = attent.Present,
+                                      Timestamp = attent.Timestamp.DateTime,
                                   };
 
             return attentdanceList;

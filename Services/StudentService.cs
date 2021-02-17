@@ -228,7 +228,9 @@
                                   ClassId = student.ClassId,
                                   Gender = student.Gender,
                                   ProfileStoragePath = student.ProfileStoragePath,
-                                  TrainStudentModel = student.TrainStudentModel
+                                  TrainStudentModel = student.TrainStudentModel,
+                                  Timestamp = student.Timestamp.DateTime,
+                                  UpdatedOn = student.UpdatedOn
                               };
 
             return studentList;

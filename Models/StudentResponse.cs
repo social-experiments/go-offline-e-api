@@ -1,5 +1,6 @@
 ﻿namespace goOfflineE.Models
 {
+    using System;
     using System.ComponentModel.DataAnnotations;
 
     /// <summary>
@@ -97,5 +98,9 @@
         /// Gets or sets a value indicating whether TrainStudentModel.
         /// </summary>
         public bool TrainStudentModel { get; set; }
+
+        public DateTime? Timestamp { get; set; }
+
+        public DateTime? UpdatedOn { get; set; }
     }
 }

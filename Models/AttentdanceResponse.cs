@@ -1,4 +1,6 @@
-﻿namespace goOfflineE.Models
+﻿using System;
+
+namespace goOfflineE.Models
 {
     /// <summary>
     /// Defines the <see cref="AttentdanceResponse" />.
@@ -49,5 +51,8 @@
         /// Gets or sets the Longitude.
         /// </summary>
         public string Longitude { get; set; }
+
+        public DateTime Timestamp { get; set; }
+
     }
 }

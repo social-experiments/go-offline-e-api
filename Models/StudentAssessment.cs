@@ -57,6 +57,11 @@
         public List<Answer> AssessmentAnswers { get; set; }
 
         /// <summary>
+        /// Gets or sets the Answers.
+        /// </summary>
+        public string Answers { get; set; }
+
+        /// <summary>
         /// Gets or sets the Active.
         /// </summary>
         public bool? Active { set; get; }
