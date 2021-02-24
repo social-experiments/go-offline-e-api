@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "goOfflineE.Azure.Function.Api": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30086,
+      "useSSL": false
+    }
+  }
+}

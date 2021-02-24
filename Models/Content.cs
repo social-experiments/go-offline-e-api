@@ -51,6 +51,11 @@
         public string ThumbnailURL { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether IsOffline.
+        /// </summary>
+        public bool IsOffline { get; set; }
+
+        /// <summary>
         /// Gets or sets the CreatedBy.
         /// </summary>
         public string CreatedBy { get; set; }
