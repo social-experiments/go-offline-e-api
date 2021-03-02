@@ -36,7 +36,7 @@
         /// </summary>
         /// <param name="model">The model<see cref="AssessmentShare"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        Task AssessmentShare(AssessmentShare model);
+        Task<string> AssessmentShare(AssessmentShare model);
 
         /// <summary>
         /// The GetAssignments.

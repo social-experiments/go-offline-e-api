@@ -306,8 +306,14 @@
         /// </summary>
         /// <param name="model">The model<see cref="AssessmentShare"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task AssessmentShare(AssessmentShare model)
+        public async Task<string> AssessmentShare(AssessmentShare model)
         {
+            var sharedAssessments = await _tableStorage.GetAllAsync<Entites.AssessmentShare>("AssessmentShare");
+            var isShared = sharedAssessments.Any(assessment => assessment.ClassId == model.ClassId && assessment.AssessmentId == model.AssessmentId);
+
+            if (isShared)
+                return "Already shared assessment.";
+
             // Create new content
             var assessmentSharedId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
 
@@ -324,6 +330,7 @@
             try
             {
                 await _tableStorage.AddAsync("AssessmentShare", assessmentShare);
+                return "Assessment shared successfully.";
             }
             catch (Exception ex)
             {
