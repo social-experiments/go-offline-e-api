@@ -337,5 +337,17 @@
 
             return attentdanceList;
         }
+
+        /// <summary>
+        /// The CheckIsAttendanceProcessed.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
+        public async Task<bool> VerifyIsAttendanceProcessed(string schoolId, string classId)
+        {
+            var attentdance = await _tableStorage.GetAllAsync<Entites.Attentdance>("Attentdance");
+            return attentdance.Any((a) => a.PartitionKey == schoolId && a.ClassRoomId == classId && a.Timestamp.Date == DateTime.Today.Date);
+        }
     }
 }
