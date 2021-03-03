@@ -31,5 +31,13 @@
         /// </summary>
         /// <returns>The <see cref="Task{IEnumerable{AttentdanceResponse}}"/>.</returns>
         Task<IEnumerable<AttentdanceResponse>> GetAttentdance();
+
+        /// <summary>
+        /// The CheckIsAttendanceProcessed.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
+        Task<bool> VerifyIsAttendanceProcessed(string schoolId, string classId);
     }
 }

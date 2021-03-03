@@ -188,9 +188,10 @@ namespace goOfflineE.Functions
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
             AssessmentShare requestData = JsonConvert.DeserializeObject<AssessmentShare>(requestBody);
 
+            string result;
             try
             {
-                await _assessmentService.AssessmentShare(requestData);
+                result = await _assessmentService.AssessmentShare(requestData);
 
             }
             catch (HttpResponseException ex)
@@ -198,7 +199,7 @@ namespace goOfflineE.Functions
                 return new ConflictObjectResult(ex.Response.Content);
 
             }
-            return new OkObjectResult(new { message = "Assessment shared successfully." });
+            return new OkObjectResult(new { message = result });
         }
     }
 }

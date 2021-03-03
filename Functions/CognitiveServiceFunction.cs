@@ -84,5 +84,27 @@ namespace goOfflineE.Functions
 
             return new OkObjectResult(new { message = "Process attendance successful." });
         }
+
+        /// <summary>
+        /// The VerifyIsAttendanceProcessed.
+        /// </summary>
+        /// <param name="req">The req<see cref="HttpRequest"/>.</param>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("VerifyIsAttendanceProcessed")]
+        public async Task<IActionResult> VerifyIsAttendanceProcessed(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "verify/{schoolId}/{classId}/attendance")] HttpRequest req, string schoolId, string classId)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            var response = await _cognitiveService.VerifyIsAttendanceProcessed(schoolId, classId);
+
+            return new OkObjectResult(response);
+        }
     }
 }
