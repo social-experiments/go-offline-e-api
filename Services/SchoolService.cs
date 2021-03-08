@@ -74,6 +74,7 @@
                 school.CreatedBy = model.CreatedBy;
                 school.UpdatedOn = DateTime.UtcNow;
                 school.UpdatedBy = model.CreatedBy;
+                school.ImageURL = model.ImageURL;
 
                 try
                 {
@@ -102,6 +103,7 @@
                     CreatedBy = model.CreatedBy,
                     UpdatedOn = DateTime.UtcNow,
                     UpdatedBy = model.CreatedBy,
+                    ImageURL = model.ImageURL,
                 };
 
                 try

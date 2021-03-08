@@ -61,6 +61,11 @@
         public string Zip { get; set; }
 
         /// <summary>
+        /// Gets or sets the ImageURL.
+        /// </summary>
+        public string ImageURL { get; set; }
+
+        /// <summary>
         /// Gets or sets the Latitude.
         /// </summary>
         public string Latitude { get; set; }
