@@ -1,5 +1,6 @@
 ﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Common.Enums;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using goOfflineE.Repository;
@@ -18,13 +19,16 @@
         /// </summary>
         private readonly ITableStorage _tableStorage;
 
+        private readonly IPushNotificationService _pushNotificationService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
-        public ContentService(ITableStorage tableStorage)
+        public ContentService(ITableStorage tableStorage, IPushNotificationService pushNotificationService)
         {
             _tableStorage = tableStorage;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -50,6 +54,7 @@
             try
             {
                 await _tableStorage.AddAsync("Distribution", newContent);
+                await SendPushNotificationToStudent(model);
             }
             catch (Exception ex)
             {
@@ -82,6 +87,7 @@
                 try
                 {
                     await _tableStorage.UpdateAsync("Content", content);
+                    await SendPushNotificationToTeacher(content.CourseName);
                 }
                 catch (Exception ex)
                 {
@@ -110,6 +116,7 @@
                 try
                 {
                     await _tableStorage.AddAsync("Content", newContent);
+                    await SendPushNotificationToTeacher(content.CourseName);
                 }
                 catch (Exception ex)
                 {
@@ -180,6 +187,66 @@
             }
 
             return contentList;
+        }
+
+        private async Task SendPushNotificationToStudent(Distribution model)
+        {
+            try
+            {
+                var contents = await _tableStorage.GetAllAsync<Entites.Content>("Content");
+                var content = contents.SingleOrDefault(user => user.RowKey == model.ContentId);
+
+                var pushNotification = new PushNotification
+                {
+                    Title = $"Course content {content.CourseName}",
+                    Body = $"Course content available, ${content.CourseDescription}"
+                };
+
+                var studentData = await _tableStorage.GetAllAsync<Entites.Student>("Student");
+                var students = studentData.Where(s => s.PartitionKey == model.SchoolId && s.ClassId == model.ClassId);
+                foreach (var student in students)
+                {
+                    if (!String.IsNullOrEmpty(student.NotificationToken))
+                    {
+                        pushNotification.RecipientDeviceToken = student.NotificationToken;
+                        await _pushNotificationService.SendAsync(pushNotification);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
+        }
+
+        private async Task SendPushNotificationToTeacher(string courseName)
+        {
+            try
+            {
+                  var pushNotification = new PushNotification
+                {
+                    Title = "Course content",
+                    Body = $"New course content available {courseName}"
+                };
+
+                var userData = await _tableStorage.GetAllAsync<Entites.User>("User");
+                var users = userData.Where(u => u.Role == Role.Teacher.ToString());
+                foreach (var user in users)
+                {
+                    if (!String.IsNullOrEmpty(user.NotificationToken))
+                    {
+                        pushNotification.RecipientDeviceToken = user.NotificationToken;
+                        await _pushNotificationService.SendAsync(pushNotification);
+                    }
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
+
         }
     }
 }
