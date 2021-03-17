@@ -229,7 +229,7 @@
                                  orderby assessment.UpdatedOn descending
                                  select new StudentAssessment
                                  {
-                                     Id = assessment.RowKey,
+                                     Id = assessment.RowKey, 
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
                                      Answers = assessment.AssessmentAnswers,

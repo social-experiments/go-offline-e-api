@@ -87,7 +87,11 @@
                 try
                 {
                     await _tableStorage.UpdateAsync("Content", content);
-                    await SendPushNotificationToTeacher(content.CourseName);
+                    if(content.Active == true)
+                    {
+                        await SendPushNotificationToTeacher(content.CourseName);
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
