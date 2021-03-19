@@ -1,5 +1,6 @@
 ﻿namespace goOfflineE.Services
 {
+    using goOfflineE.Common.Enums;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using goOfflineE.Repository;
@@ -30,12 +31,19 @@
         private readonly ITableStorage _tableStorage;
 
         /// <summary>
+        /// Defines the _pushNotificationService.
+        /// </summary>
+        private readonly IPushNotificationService _pushNotificationService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AssessmentService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
-        public AssessmentService(ITableStorage tableStorage)
+        /// <param name="pushNotificationService">The pushNotificationService<see cref="IPushNotificationService"/>.</param>
+        public AssessmentService(ITableStorage tableStorage, IPushNotificationService pushNotificationService)
         {
             _tableStorage = tableStorage;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -118,7 +126,8 @@
 
             try
             {
-                await _tableStorage.AddAsync("StudentAssessments", studentAssessment);
+                await _tableStorage.AddAsync("StudentAssessments", studentAssessment)
+                    await SendPushNotificationToTeacher(model);
             }
             catch (Exception ex)
             {
@@ -229,7 +238,7 @@
                                  orderby assessment.UpdatedOn descending
                                  select new StudentAssessment
                                  {
-                                     Id = assessment.RowKey, 
+                                     Id = assessment.RowKey,
                                      CreatedDate = assessment.Timestamp.DateTime,
                                      AssessmentId = assessment.AssessmentId,
                                      Answers = assessment.AssessmentAnswers,
@@ -312,7 +321,9 @@
             var isShared = sharedAssessments.Any(assessment => assessment.ClassId == model.ClassId && assessment.AssessmentId == model.AssessmentId);
 
             if (isShared)
+            {
                 return "Already shared assessment.";
+            }
 
             // Create new content
             var assessmentSharedId = String.IsNullOrEmpty(model.Id) ? Guid.NewGuid().ToString() : model.Id;
@@ -330,6 +341,7 @@
             try
             {
                 await _tableStorage.AddAsync("AssessmentShare", assessmentShare);
+                await SendPushNotificationToStudent(model);
                 return "Assessment shared successfully.";
             }
             catch (Exception ex)
@@ -389,6 +401,78 @@
                 assessments.Add(assessment);
             }
             return assessments;
+        }
+
+        /// <summary>
+        /// The SendPushNotificationToStudent.
+        /// </summary>
+        /// <param name="model">The model<see cref="AssessmentShare"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task SendPushNotificationToStudent(AssessmentShare model)
+        {
+            try
+            {
+                var assessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+                var assessment = assessments.SingleOrDefault(a => a.RowKey == model.AssessmentId);
+
+                var pushNotification = new PushNotification
+                {
+                    Title = $"{assessment.SubjectName}",
+                    Body = $"Assessment available, ${assessment.AssessmentTitle}"
+                };
+
+                var studentData = await _tableStorage.GetAllAsync<Entites.Student>("Student");
+                var students = studentData.Where(s => s.PartitionKey == model.SchoolId && s.ClassId == model.ClassId);
+                foreach (var student in students)
+                {
+                    if (!String.IsNullOrEmpty(student.NotificationToken))
+                    {
+                        pushNotification.RecipientDeviceToken = student.NotificationToken;
+                        await _pushNotificationService.SendAsync(pushNotification);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
+        /// The SendPushNotificationToTeacher.
+        /// </summary>
+        /// <param name="model">The model<see cref="StudentAssessment"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task SendPushNotificationToTeacher(StudentAssessment model)
+        {
+            try
+            {
+                var assessments = await _tableStorage.GetAllAsync<Entites.Assessment>("Assessments");
+                var assessment = assessments.SingleOrDefault(a => a.RowKey == model.AssessmentId);
+
+                var pushNotification = new PushNotification
+                {
+                    Title = model.StudentName,
+                    Body = $"Assessment {assessment.SubjectName} - {assessment.AssessmentTitle} submitted"
+                };
+
+                var userData = await _tableStorage.GetAllAsync<Entites.User>("User");
+                var users = userData.Where(u => u.Role == Role.Teacher.ToString() && u.RowKey == assessment.CreatedBy);
+                foreach (var user in users)
+                {
+                    if (!String.IsNullOrEmpty(user.NotificationToken))
+                    {
+                        pushNotification.RecipientDeviceToken = user.NotificationToken;
+                        await _pushNotificationService.SendAsync(pushNotification);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Exception thrown in Notify Service: ", ex.InnerException);
+            }
         }
     }
 }
