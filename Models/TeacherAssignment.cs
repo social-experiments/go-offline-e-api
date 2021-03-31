@@ -62,6 +62,11 @@
         public string AssignmentURL { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether IsOffline.
+        /// </summary>
+        public bool IsOffline { get; set; }
+
+        /// <summary>
         /// Gets or sets the Active.
         /// </summary>
         public bool? Active { set; get; }

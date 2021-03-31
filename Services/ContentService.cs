@@ -120,7 +120,7 @@
                 try
                 {
                     await _tableStorage.AddAsync("Content", newContent);
-                    await SendPushNotificationToTeacher(content.CourseName);
+                    await SendPushNotificationToTeacher(model.CourseName);
                 }
                 catch (Exception ex)
                 {
