@@ -126,8 +126,8 @@
 
             try
             {
-                await _tableStorage.AddAsync("StudentAssessments", studentAssessment)
-                    await SendPushNotificationToTeacher(model);
+                await _tableStorage.AddAsync("StudentAssessments", studentAssessment);
+                await SendPushNotificationToTeacher(model);
             }
             catch (Exception ex)
             {
