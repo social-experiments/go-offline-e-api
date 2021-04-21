@@ -29,6 +29,6 @@
         /// <param name="className">The className<see cref="string"/>.</param>
         /// <param name="subjectName">The subjectName<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{TeacherAssignment}}"/>.</returns>
-        Task<IEnumerable<TeacherAssignment>> GetAssignments(string schoolId, string classId);
+        Task<IEnumerable<TeacherAssignment>> GetAssignments(string schoolId);
     }
 }
