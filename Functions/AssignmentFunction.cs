@@ -91,15 +91,15 @@ namespace goOfflineE.Functions
         [FunctionName("AssignmentList")]
         [OpenApiOperation("List", "Assignment")]
         public async Task<IActionResult> AssignmentList(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assignment/{schoolId}/{classId}")] HttpRequest req, string schoolId, string classId)
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "assignment/{schoolId}")] HttpRequest req, string schoolId)
         {
             var validateStatus = base.AuthorizationStatus(req);
-            if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId) || String.IsNullOrEmpty(classId))
+            if (validateStatus != System.Net.HttpStatusCode.Accepted || String.IsNullOrEmpty(schoolId) )
             {
                 return new BadRequestObjectResult(validateStatus);
             }
 
-            var response = await _assignmentService.GetAssignments(schoolId, classId);
+            var response = await _assignmentService.GetAssignments(schoolId);
 
             return new OkObjectResult(response);
         }

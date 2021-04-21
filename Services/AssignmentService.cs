@@ -155,10 +155,10 @@
         /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
         /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{IEnumerable{TeacherAssignment}}"/>.</returns>
-        public async Task<IEnumerable<TeacherAssignment>> GetAssignments(string schoolId, string classId)
+        public async Task<IEnumerable<TeacherAssignment>> GetAssignments(string schoolId)
         {
             TableQuery<Entites.Assignment> assignmentQuery = new TableQuery<Entites.Assignment>()
-                 .Where(TableQuery.GenerateFilterCondition("ClassId", QueryComparisons.Equal, classId));
+                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, schoolId));
             var assignments = await _tableStorage.QueryAsync<Entites.Assignment>("Assignment", assignmentQuery);
 
             TableQuery<Entites.StudentAssignment> query = new TableQuery<Entites.StudentAssignment>()
