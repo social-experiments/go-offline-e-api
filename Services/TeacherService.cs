@@ -224,7 +224,8 @@
             emailBody.AppendFormat("Congratulations! <br/>", Environment.NewLine);
             emailBody.AppendFormat("You have registerd with portal! Below are the login credentials <br/>", Environment.NewLine);
             emailBody.AppendFormat($"User Name: <b>{registerRequest.Email} </b> <br/>", Environment.NewLine);
-            emailBody.AppendFormat($"Password: {registerRequest.Password} </b></p>", Environment.NewLine);
+            emailBody.AppendFormat($"Password:<b> {registerRequest.Password} </b></p>", Environment.NewLine);
+            emailBody.AppendFormat($"<p>Click here to login: <a href=${SettingConfigurations.WebSiteUrl}>${SettingConfigurations.WebSiteUrl}</a> </p>");
             EmailRequest emailRequest = new EmailRequest
             {
                 To = new List<string>

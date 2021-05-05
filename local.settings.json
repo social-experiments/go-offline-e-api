@@ -13,6 +13,7 @@
     "SMTP_PASSWORD": "S0ciale*9s",
     "SMTP_SERVER": "smtp.gmail.com",
     "SMTP_PORT": "465",
+    "NON_PROFIT_ACCOUNT_EMAIL": "socialexpsindia@gmail.com;dattatray.chaskar@gmail.com;navjoshi121@gmail.com",
 
     "ApplicationId": "49be2977-8d26-4b63-9d67-e4e78cc30705",
     "ApplicationSecret": "1+ruJugflpXdxRK0eQUMFQ4CxCpQCXa+ELzERww3inY=",

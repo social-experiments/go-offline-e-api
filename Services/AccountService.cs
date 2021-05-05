@@ -56,7 +56,15 @@
         /// </summary>
         private readonly IContentService _contentService;
 
+        /// <summary>
+        /// Defines the _assessmentService.
+        /// </summary>
         private readonly IAssessmentService _assessmentService;
+
+        /// <summary>
+        /// Defines the _emailService.
+        /// </summary>
+        private readonly IEmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
@@ -66,14 +74,17 @@
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
         /// <param name="classService">The classService<see cref="IClassService"/>.</param>
+        /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
         /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
+        /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
         public AccountService(ITableStorage tableStorage,
             ISchoolService schoolService,
             IMapper mapper,
             IStudentService studentService,
             IClassService classService,
             IAssessmentService assessmentService,
-            IContentService contentService)
+            IContentService contentService,
+            IEmailService emailService)
         {
             _tableStorage = tableStorage;
             _schoolService = schoolService;
@@ -82,6 +93,7 @@
             _classService = classService;
             _contentService = contentService;
             _assessmentService = assessmentService;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -354,11 +366,22 @@
             return response;
         }
 
+        /// <summary>
+        /// The SyncData.
+        /// </summary>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <param name="classId">The classId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{AuthenticateResponse}"/>.</returns>
         public Task<AuthenticateResponse> SyncData(string schoolId = null, string classId = null)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The RefreshPushNotificationToken.
+        /// </summary>
+        /// <param name="token">The token<see cref="PushNotificationToken"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public async Task RefreshPushNotificationToken(PushNotificationToken token)
         {
             try
@@ -390,7 +413,153 @@
             {
                 throw new AppException("Error: Refresh push notification token ", ex.InnerException);
             }
-           
+        }
+
+        /// <summary>
+        /// The NonProfitAccountRegistration.
+        /// </summary>
+        /// <param name="nonProfitAccount">The nonProfitAccount<see cref="Models.NonProfitAccount"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public async Task NonProfitAccountRegistration(Models.NonProfitAccount nonProfitAccount)
+        {
+            var id = String.IsNullOrEmpty(nonProfitAccount.Id) ? Guid.NewGuid().ToString() : nonProfitAccount.Id;
+            var account = new Entites.NonProfitAccount(nonProfitAccount.RegistrationNo, id)
+            {
+                Address = nonProfitAccount.Address,
+                Email = nonProfitAccount.Email,
+                Location = nonProfitAccount.Location,
+                NameOfNGO = nonProfitAccount.NameOfNGO,
+                OperationalLocations = nonProfitAccount.OperationalLocations,
+                PhoneNo = nonProfitAccount.PhoneNo,
+                RegistrationNo = nonProfitAccount.RegistrationNo,
+                TaxRegistrationNo = nonProfitAccount.TaxRegistrationNo,
+                Active = false,
+                CreatedBy = "system",
+                UpdatedOn = DateTime.UtcNow,
+                UpdatedBy = "system",
+            };
+
+            try
+            {
+                account.OTP = await GenerateTOPAndSend(account.Email);
+                account.OTPDate = DateTime.UtcNow;
+                await _tableStorage.AddAsync("NonProfitAccount", account);
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new AppException("Create non profit account error: ", ex.InnerException);
+            }
+        }
+
+        /// <summary>
+        /// The GenerateTOPAndSend.
+        /// </summary>
+        /// <param name="emailId">The emailId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{string}"/>.</returns>
+
+
+        /// <summary>
+        /// The OTPNonProfitVerification.
+        /// </summary>
+        /// <param name="nonProfitAccount">The nonProfitAccount<see cref="Models.NonProfitAccount"/>.</param>
+        /// <returns>The <see cref="Task{string}"/>.</returns>
+        public async Task<bool> OTPNonProfitVerification(Models.NonProfitAccount nonProfitAccount)
+        {
+            var accounts = await _tableStorage.GetAllAsync<Entites.NonProfitAccount>("NonProfitAccount");
+            var account = accounts.SingleOrDefault(s => s.RegistrationNo == nonProfitAccount.RegistrationNo && s.Email == nonProfitAccount.Email);
+            if (account.OTP == nonProfitAccount.OTP)
+            {
+                try
+                {
+                    account.OTP = string.Empty;
+                    account.OTPDate = DateTime.UtcNow;
+                    await NewNonProfirAccountNotificationEmail(nonProfitAccount);
+                    await _tableStorage.UpdateAsync("NonProfitAccount", account);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("OTP verification non profit account error: ", ex.InnerException);
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The GenerateTOPAndSend.
+        /// </summary>
+        /// <param name="emailId">The emailId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{string}"/>.</returns>
+        private async Task<string> GenerateTOPAndSend(string emailId)
+        {
+            var OTP = new Random().Next(0, 1000000).ToString("D6");
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.AppendFormat("<p>Hi, <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Your new non profit account verification code is: {OTP} </b></p>", Environment.NewLine);
+            EmailRequest emailRequest = new EmailRequest
+            {
+                To = new List<string>
+            {
+               emailId
+            },
+                Subject = "Non profit account verification code!",
+                HtmlContent = emailBody.ToString()
+            };
+
+            try
+            {
+                await _emailService.SendAsync(emailRequest);
+            }
+            catch (Exception ex)
+            {
+
+                throw new AppException("Create non profit account otp send error: ", ex.InnerException);
+            }
+
+            return OTP;
+        }
+
+        /// <summary>
+        /// The NewTeacherNotificationEmail.
+        /// </summary>
+        /// <param name="nonProfitAccount">The nonProfitAccount<see cref="Models.NonProfitAccount"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task NewNonProfirAccountNotificationEmail(Models.NonProfitAccount nonProfitAccount)
+        {
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.AppendFormat("<p>Hi, <br/>", Environment.NewLine);
+            emailBody.AppendFormat("Congratulations! <br/>", Environment.NewLine);
+            emailBody.AppendFormat("New Non profit account, <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Name Of NGO: <b>{nonProfitAccount.NameOfNGO} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Registration No: <b>{nonProfitAccount.RegistrationNo} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Email: <b>{nonProfitAccount.Email} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Address: <b>{nonProfitAccount.Address} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Phone No: <b>{nonProfitAccount.PhoneNo} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Location: <b>{nonProfitAccount.Location} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Operational Locations: <b>{nonProfitAccount.OperationalLocations} </b> <br/>", Environment.NewLine);
+            emailBody.AppendFormat($"Tax Registration No:<b> {nonProfitAccount.TaxRegistrationNo} </b></p>", Environment.NewLine);
+
+            var emails = SettingConfigurations.NonProfitAccountEmails.Split(';').ToList();
+
+            EmailRequest emailRequest = new EmailRequest
+            {
+                To = emails,
+                Subject = "New Non-Profit Account Registration!",
+                HtmlContent = emailBody.ToString()
+            };
+
+            try
+            {
+                await _emailService.SendAsync(emailRequest);
+            }
+            catch (Exception ex)
+            {
+
+                throw new AppException("New Non-Profit account notification Email error: ", ex.InnerException);
+            }
         }
     }
 }

@@ -73,7 +73,6 @@
             }
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            message.Content += $"<p>Click here to login: <a href=${SettingConfigurations.WebSiteUrl}>${SettingConfigurations.WebSiteUrl}</a> </p>";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Content };
 
             return emailMessage;

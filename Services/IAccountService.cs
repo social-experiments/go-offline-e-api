@@ -80,7 +80,7 @@
         Task Delete(string id);
 
         /// <summary>
-        /// The RefreshPushNotificationToken.
+        /// The RefreshPushNotificationToken.distrubuted.
         /// </summary>
         /// <param name="token">The token<see cref="PushNotificationToken"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
@@ -93,5 +93,19 @@
         /// <param name="classId">The classId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{AuthenticateResponse}"/>.</returns>
         Task<AuthenticateResponse> SyncData(string schoolId = null, string classId = null);
+
+        /// <summary>
+        /// The NonProfitAccountRegistration.
+        /// </summary>
+        /// <param name="nonProfitAccount">The nonProfitAccount<see cref="NonProfitAccount"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        Task NonProfitAccountRegistration(NonProfitAccount nonProfitAccount);
+
+        /// <summary>
+        /// The OTPNonProfitVerification.
+        /// </summary>
+        /// <param name="nonProfitAccount">The nonProfitAccount<see cref="NonProfitAccount"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
+        Task<bool> OTPNonProfitVerification(NonProfitAccount nonProfitAccount);
     }
 }
