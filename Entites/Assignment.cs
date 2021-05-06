@@ -34,6 +34,11 @@
         public string AssignmentDescription { get; set; }
 
         /// <summary>
+        /// Gets or sets the AssignmentLevel.
+        /// </summary>
+        public string AssignmentLevel { get; set; }
+
+        /// <summary>
         /// Gets or sets the AssignmentURL.
         /// </summary>
         public string AssignmentURL { get; set; }

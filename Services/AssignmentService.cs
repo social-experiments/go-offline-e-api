@@ -128,6 +128,7 @@
 
                     AssignmentName = model.AssignmentName,
                     AssignmentDescription = model.AssignmentDescription,
+                    AssignmentLevel = model.AssignmentLevel,
                     AssignmentURL = model.AssignmentURL,
                     ClassId = model.ClassId,
                     SubjectName = model.SubjectName,
@@ -176,6 +177,7 @@
                                      CreatedDate = assignment.Timestamp.DateTime,
                                      AssignmentName = assignment.AssignmentName,
                                      AssignmentDescription = assignment.AssignmentDescription,
+                                     AssignmentLevel = assignment.AssignmentLevel,
                                      AssignmentURL = assignment.AssignmentURL,
                                      SubjectName = assignment.SubjectName,
                                      StudentAssignments = (from sa in studassignments

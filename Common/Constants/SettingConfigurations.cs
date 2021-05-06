@@ -44,6 +44,11 @@
         public static string SMTPPassword => Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
         /// <summary>
+        /// Gets the NonProfitAccountEmails.
+        /// </summary>
+        public static string NonProfitAccountEmails => Environment.GetEnvironmentVariable("NON_PROFIT_ACCOUNT_EMAIL");
+
+        /// <summary>
         /// Gets the AzureWebJobsStorage.
         /// </summary>
         public static string AzureWebJobsStorage => Environment.GetEnvironmentVariable("AzureWebJobsStorage");

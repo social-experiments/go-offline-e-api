@@ -130,5 +130,46 @@ namespace goOfflineE.Functions
 
             return new OkObjectResult(new { message = "Refresh token successfully." });
         }
+
+        /// <summary>
+        /// The RegisterNonProfitAccount.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("NonProfitAccount")]
+        public async Task<IActionResult> RegisterNonProfitAccount(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "register/account")]
+            [RequestBodyType(typeof(NonProfitAccount), "Register New non-profit account")] HttpRequest request)
+        {
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            NonProfitAccount requestData = JsonConvert.DeserializeObject<NonProfitAccount>(requestBody);
+
+            await _accountService.NonProfitAccountRegistration(requestData);
+
+            return new OkObjectResult(new { message = "Registration successful." });
+        }
+
+        /// <summary>
+        /// The OTPVerification.
+        /// </summary>
+        /// <param name="request">The request<see cref="HttpRequest"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
+        [FunctionName("OTPVerification")]
+        public async Task<IActionResult> OTPVerification(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "otp/verification")]
+            [RequestBodyType(typeof(NonProfitAccount), "OTP verification")] HttpRequest request)
+        {
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            NonProfitAccount requestData = JsonConvert.DeserializeObject<NonProfitAccount>(requestBody);
+
+            if (String.IsNullOrEmpty(requestData.Email) && String.IsNullOrEmpty(requestData.OTP))
+            {
+                return new UnauthorizedResult();
+            }
+
+            var response = await _accountService.OTPNonProfitVerification(requestData);
+
+            return new OkObjectResult(response);
+        }
     }
 }
