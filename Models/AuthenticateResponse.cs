@@ -15,6 +15,7 @@ namespace goOfflineE.Models
             this.Schools = new List<School>();
             this.CourseContent = new List<Content>();
             this.AssessmentCategory = new List<string>();
+            this.AssociateMenu = new List<string>();
         }
 
         /// <summary>
@@ -31,6 +32,11 @@ namespace goOfflineE.Models
         /// Gets or sets the AssessmentCategory.
         /// </summary>
         public List<string> AssessmentCategory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the AssociateMenu.
+        /// </summary>
+        public List<string> AssociateMenu { get; set; }
 
         /// <summary>
         /// Gets or sets the CourseContent.
