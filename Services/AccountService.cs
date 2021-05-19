@@ -67,6 +67,11 @@
         private readonly IEmailService _emailService;
 
         /// <summary>
+        /// Defines the _settingService.
+        /// </summary>
+        private readonly ISettingService _settingService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
@@ -76,6 +81,7 @@
         /// <param name="classService">The classService<see cref="IClassService"/>.</param>
         /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
         /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
+        /// <param name="settingService">The settingService<see cref="ISettingService"/>.</param>
         /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
         public AccountService(ITableStorage tableStorage,
             ISchoolService schoolService,
@@ -84,6 +90,7 @@
             IClassService classService,
             IAssessmentService assessmentService,
             IContentService contentService,
+            ISettingService settingService,
             IEmailService emailService)
         {
             _tableStorage = tableStorage;
@@ -94,6 +101,7 @@
             _contentService = contentService;
             _assessmentService = assessmentService;
             _emailService = emailService;
+            _settingService = settingService;
         }
 
         /// <summary>
@@ -123,6 +131,8 @@
             var courseContent = await _contentService.GetAll();
             var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
 
+            var associateMenu = await _settingService.GetMenus(account.Role);
+
             var response = new AuthenticateResponse
             {
                 Id = account.RowKey,
@@ -133,6 +143,7 @@
                 Schools = schools.ToList(),
                 CourseContent = courseContent.ToList(),
                 AssessmentCategory = assessmentCategories,
+                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 Token = jwtToken
             };
@@ -341,12 +352,12 @@
                 Gender = student.Gender
             };
 
+            var associateMenu = await _settingService.GetMenus("Student");
             var courseContent = await _contentService.GetAll(student.PartitionKey, student.ClassId);
             var school = await _schoolService.Get(student.PartitionKey);
             var classRoom = await _classService.Get(student.ClassId);
 
             classRoom.Students.Add(studentRes);
-
             school.ClassRooms.Add(classRoom);
 
             var response = new AuthenticateResponse
@@ -357,7 +368,8 @@
                 LastName = student.LastName,
                 Email = student.EnrolmentNo,
                 Role = Role.Student.ToString(),
-                CourseContent = courseContent.ToList(),
+                CourseContent = courseContent?.ToList(),
+                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 Token = jwtToken
             };
 

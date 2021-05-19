@@ -60,6 +60,7 @@ namespace goOfflineE
             services.AddTransient<IAssignmentService, AssignmentService>();
             services.AddTransient<IAssessmentService, AssessmentService>();
             services.AddTransient<IPushNotificationService, PushNotificationService>();
+            services.AddTransient<ISettingService, SettingService>();
 
             services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
             services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),
