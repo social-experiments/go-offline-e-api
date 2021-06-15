@@ -79,5 +79,10 @@
         /// Gets or sets the NotificationToken.
         /// </summary>
         public string NotificationToken { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TenantId.
+        /// </summary>
+        public string TenantId { get; set; }
     }
 }
