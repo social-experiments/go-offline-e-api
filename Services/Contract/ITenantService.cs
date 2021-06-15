@@ -18,8 +18,9 @@
         /// <summary>
         /// The Get.
         /// </summary>
+        /// <param name="tentantId">The tentantId<see cref="string"/>.</param>
         /// <returns>The <see cref="Task{Tenant}"/>.</returns>
-        Task<Tenant> Get();
+        Task<Tenant> Get(string tentantId);
 
         /// <summary>
         /// The CreateUpdate.

@@ -29,6 +29,7 @@ namespace goOfflineE.Helpers
 
             CreateMap<User, TeacherResponse>();
             CreateMap<Teacher, TeacherResponse>();
+            CreateMap<Entites.Tenant, Models.Tenant>().ReverseMap();
 
             CreateMap<UpdateRequest, User>()
                 .ForAllMembers(x => x.Condition(
