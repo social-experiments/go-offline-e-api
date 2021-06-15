@@ -10,6 +10,11 @@
 	<Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Services\Implementation\**" />
+    <EmbeddedResource Remove="Services\Implementation\**" />
+    <None Remove="Services\Implementation\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.7.0" />
     <PackageReference Include="AzureExtensions.Swashbuckle" Version="3.2.2" />
@@ -45,6 +50,5 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Services\Contract\" />
-    <Folder Include="Services\Implementation\" />
   </ItemGroup>
 </Project>
