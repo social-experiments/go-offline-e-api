@@ -9,6 +9,7 @@
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Net;
+    using System.Security.Claims;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -106,6 +107,7 @@
                     var result = handler.ValidateToken(token, tokenParams, out var securityToken);
                     if (result.HasClaim((result) => result.Issuer == issuer))
                     {
+                        var tenantId = result.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid)?.Value;
                         request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Accepted).ToString());
                     }
                     else

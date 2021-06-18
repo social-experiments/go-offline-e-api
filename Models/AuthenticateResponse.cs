@@ -74,6 +74,11 @@ namespace goOfflineE.Models
         public string Token { get; set; }
 
         /// <summary>
+        /// Gets or sets the TenantId.
+        /// </summary>
+        public string TenantId { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether ForceChangePasswordNextLogin.
         /// </summary>
         public bool ForceChangePasswordNextLogin { get; set; }

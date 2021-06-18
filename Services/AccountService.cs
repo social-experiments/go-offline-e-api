@@ -125,7 +125,7 @@
             }
 
             // authentication successful so generate jwt
-            var jwtToken = GenerateToken(account.RowKey);
+            var jwtToken = GenerateToken(account.RowKey, account.TenantId);
 
             var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
             var courseContent = await _contentService.GetAll();
@@ -145,6 +145,7 @@
                 AssessmentCategory = assessmentCategories,
                 AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
+                TenantId = account.TenantId,
                 Token = jwtToken
             };
 
@@ -289,7 +290,7 @@
         /// </summary>
         /// <param name="userId">The userId<see cref="string"/>.</param>
         /// <returns>The <see cref="string"/>.</returns>
-        public string GenerateToken(string userId)
+        public string GenerateToken(string userId, string tenantId)
         {
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SettingConfigurations.IssuerToken));
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -299,6 +300,7 @@
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, userId),
+                     new Claim(ClaimTypes.GroupSid, tenantId ?? ""),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = SettingConfigurations.Issuer,
@@ -331,7 +333,7 @@
             }
 
             // authentication successful so generate jwt
-            var jwtToken = GenerateToken(student.RowKey);
+            var jwtToken = GenerateToken(student.RowKey, student.TenantId);
 
             var studentRes = new StudentResponse
             {

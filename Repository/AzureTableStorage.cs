@@ -1,5 +1,8 @@
 ﻿namespace goOfflineE.Repository
 {
+    using goOfflineE.Common.Constants;
+    using goOfflineE.Services;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
@@ -26,10 +29,19 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureTableStorage"/> class.
         /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        public AzureTableStorage(string connectionString)
+        /// <param name="httpContextAccessor">The httpContextAccessor<see cref="IHttpContextAccessor"/>.</param>
+        /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
+        public AzureTableStorage(IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider)
         {
-            CloudStorageAccount account = CloudStorageAccount.Parse(connectionString);
+            var tenantId = Convert.ToString(httpContextAccessor.HttpContext.Items["Tenant"]);
+            CloudStorageAccount account = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
+            if (!String.IsNullOrEmpty(tenantId))
+            {
+                var tenantService = (ITenantService)serviceProvider.GetService(typeof(ITenantService));
+                var tenant = tenantService.Get(tenantId).Result;
+                account = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+            }
+
             _client = account.CreateCloudTableClient();
 
             _tables = new ConcurrentDictionary<string, CloudTable>();

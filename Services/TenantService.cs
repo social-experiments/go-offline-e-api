@@ -1,6 +1,7 @@
 ﻿namespace goOfflineE.Services
 {
     using AutoMapper;
+    using goOfflineE.Helpers;
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using System;
@@ -39,9 +40,45 @@
         /// </summary>
         /// <param name="tenant">The tenant<see cref="Tenant"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public Task CreateUpdate(Tenant tenant)
+        public async Task CreateUpdate(Tenant tenant)
         {
-            throw new NotImplementedException();
+            var tentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
+            var tenantData = tentants.FirstOrDefault(tenant => tenant.AccountKey == tenant.AccountKey);
+
+            if (tenantData is null)
+            {
+                try
+                {
+                    var rowKey = Guid.NewGuid().ToString();
+                    var newMenu = new Entites.Tenant(tenant.AccountKey, rowKey)
+                    {
+                        AccountKey = tenant.AccountKey,
+                        AzureWebJobsStorage = tenant.AzureWebJobsStorage,
+                        AzureBlobURL = tenant.AzureBlobURL,
+                        Name = tenant.Name,
+                        Active = true,
+                        ApplicationSettings = tenant.ApplicationSettings,
+                        CognitiveServiceEndPoint = tenant.CognitiveServiceEndPoint,
+                        CognitiveServiceKey = tenant.CognitiveServiceKey
+                    };
+                    await _tableStorage.AddAsync("Tenants", newMenu);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Tenants Create Error: ", ex.InnerException);
+                }
+            }
+            else
+            {
+                try
+                {
+                    await _tableStorage.UpdateAsync("Tenants", tenantData);
+                }
+                catch (Exception ex)
+                {
+                    throw new AppException("Tenant Update Error: ", ex.InnerException);
+                }
+            }
         }
 
         /// <summary>
