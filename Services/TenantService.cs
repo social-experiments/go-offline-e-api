@@ -1,6 +1,7 @@
 ﻿namespace goOfflineE.Services
 {
     using AutoMapper;
+    using goOfflineE.Common.Enums;
     using goOfflineE.Helpers;
     using goOfflineE.Models;
     using goOfflineE.Repository;
@@ -20,19 +21,67 @@
         private readonly ITableStorage _tableStorage;
 
         /// <summary>
+        /// Defines the _schoolService.
+        /// </summary>
+        private readonly ISchoolService _schoolService;
+
+        /// <summary>
+        /// Defines the _studentService.
+        /// </summary>
+        private readonly IStudentService _studentService;
+
+        /// <summary>
+        /// Defines the _classService.
+        /// </summary>
+        private readonly IClassService _classService;
+
+        /// <summary>
         /// Defines the _mapper.
         /// </summary>
         private readonly IMapper _mapper;
 
         /// <summary>
+        /// Defines the _contentService.
+        /// </summary>
+        private readonly IContentService _contentService;
+
+        /// <summary>
+        /// Defines the _assessmentService.
+        /// </summary>
+        private readonly IAssessmentService _assessmentService;
+
+        /// <summary>
+        /// Defines the _settingService.
+        /// </summary>
+        private readonly ISettingService _settingService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TenantService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
+        /// <param name="schoolService">The schoolService<see cref="ISchoolService"/>.</param>
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
-        public TenantService(ITableStorage tableStorage, IMapper mapper)
+        /// <param name="studentService">The studentService<see cref="IStudentService"/>.</param>
+        /// <param name="classService">The classService<see cref="IClassService"/>.</param>
+        /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
+        /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
+        /// <param name="settingService">The settingService<see cref="ISettingService"/>.</param>
+        public TenantService(ITableStorage tableStorage, ISchoolService schoolService,
+            IMapper mapper,
+            IStudentService studentService,
+            IClassService classService,
+            IAssessmentService assessmentService,
+            IContentService contentService,
+            ISettingService settingService)
         {
             _tableStorage = tableStorage;
+            _schoolService = schoolService;
             _mapper = mapper;
+            _studentService = studentService;
+            _classService = classService;
+            _contentService = contentService;
+            _assessmentService = assessmentService;
+            _settingService = settingService;
         }
 
         /// <summary>
@@ -101,6 +150,28 @@
             var dataTentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
             var tenants = dataTentants.ToList();
             return _mapper.Map<List<Tenant>>(tenants);
+        }
+
+        /// <summary>
+        /// The GetDataResponse.
+        /// </summary>
+        /// <param name="requestData">The requestData<see cref="DataRequest"/>.</param>
+        /// <returns>The <see cref="Task{DataResponse}"/>.</returns>
+        public async Task<DataResponse> GetDataResponse(DataRequest requestData)
+        {
+            var schools = requestData.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(requestData.SchoolId) : await _schoolService.GetAll();
+            var courseContent = await _contentService.GetAll();
+            var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
+            var associateMenu = await _settingService.GetMenus(requestData.Role);
+
+            var result = new DataResponse
+            {
+                Schools = schools.ToList(),
+                CourseContent = courseContent.ToList(),
+                AssessmentCategory = assessmentCategories,
+                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList()
+            };
+            return result;
         }
     }
 }

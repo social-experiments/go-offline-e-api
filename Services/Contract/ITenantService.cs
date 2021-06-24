@@ -28,5 +28,13 @@
         /// <param name="tenant">The tenant<see cref="Tenant"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         Task CreateUpdate(Tenant tenant);
+
+        /// <summary>
+        /// The GetDataResponse.
+        /// </summary>
+        /// <param name="role">The role<see cref="string"/>.</param>
+        /// <param name="schoolId">The schoolId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{DataResponse}"/>.</returns>
+        Task<DataResponse> GetDataResponse(DataRequest requestData);
     }
 }

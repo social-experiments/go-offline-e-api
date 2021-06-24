@@ -127,12 +127,6 @@
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey, account.TenantId);
 
-            var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
-            var courseContent = await _contentService.GetAll();
-            var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
-
-            var associateMenu = await _settingService.GetMenus(account.Role);
-
             var response = new AuthenticateResponse
             {
                 Id = account.RowKey,
@@ -140,10 +134,6 @@
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Role = account.Role,
-                Schools = schools.ToList(),
-                CourseContent = courseContent.ToList(),
-                AssessmentCategory = assessmentCategories,
-                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 TenantId = account.TenantId,
                 Token = jwtToken
@@ -370,12 +360,8 @@
                 LastName = student.LastName,
                 Email = student.EnrolmentNo,
                 Role = Role.Student.ToString(),
-                CourseContent = courseContent?.ToList(),
-                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 Token = jwtToken
             };
-
-            response.Schools.Add(school);
 
             return response;
         }

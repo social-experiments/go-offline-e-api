@@ -33,18 +33,26 @@
         /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
         public AzureTableStorage(IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider)
         {
-            var tenantId = Convert.ToString(httpContextAccessor.HttpContext.Items["Tenant"]);
-            CloudStorageAccount account = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
-            if (!String.IsNullOrEmpty(tenantId))
+            string  tenantId = "";
+            var request = httpContextAccessor.HttpContext.Request;
+            if (request != null && request.Headers.ContainsKey("Tenant"))
             {
-                var tenantService = (ITenantService)serviceProvider.GetService(typeof(ITenantService));
-                var tenant = tenantService.Get(tenantId).Result;
-                account = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+                tenantId = request.Headers["Tenant"].ToString();
             }
 
+            CloudStorageAccount account = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
             _client = account.CreateCloudTableClient();
-
             _tables = new ConcurrentDictionary<string, CloudTable>();
+            if (!String.IsNullOrEmpty(tenantId))
+            {
+                var tenants = this.GetAllAsync<Entites.Tenant>("Tenants").Result;
+                var tenant = tenants.FirstOrDefault(t => t.RowKey == tenantId);
+                account = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+                _client = account.CreateCloudTableClient();
+                _tables = new ConcurrentDictionary<string, CloudTable>();
+            }
+
+          
         }
 
         /// <summary>

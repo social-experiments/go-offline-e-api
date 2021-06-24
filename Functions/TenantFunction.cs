@@ -1,6 +1,7 @@
 namespace goOfflineE.Functions
 {
     using AzureFunctions.Extensions.Swashbuckle.Attribute;
+    using goOfflineE.Helpers.Attributes;
     using goOfflineE.Models;
     using goOfflineE.Services;
     using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ namespace goOfflineE.Functions
     /// <summary>
     /// Defines the <see cref="TenantFunction" />.
     /// </summary>
-    public class TenantFunction
+    public class TenantFunction : AuthenticationFilter
     {
         /// <summary>
         /// Defines the _tenantService.
@@ -57,5 +58,24 @@ namespace goOfflineE.Functions
             }
             return new OkObjectResult(new { message = $"Tenant {requestData.Name} create successfully." });
         }
+
+        [FunctionName("TenantData")]
+        public async Task<IActionResult> TenantData([HttpTrigger(AuthorizationLevel.Anonymous, "post",  Route = "tenant/data")]
+            [RequestBodyType(typeof(DataRequest), "Get tenant data")] HttpRequest request)
+        {
+            var validateStatus = base.AuthorizationStatus(request);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            DataRequest requestData = JsonConvert.DeserializeObject<DataRequest>(requestBody);
+
+            var response = await _tenantService.GetDataResponse(requestData);
+
+            return new OkObjectResult(response);
+        }
+
     }
 }

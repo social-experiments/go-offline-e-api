@@ -108,6 +108,7 @@
                     if (result.HasClaim((result) => result.Issuer == issuer))
                     {
                         var tenantId = result.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid)?.Value;
+                        request.HttpContext.Items["Tenant"] = tenantId;
                         request.Headers.Add("AuthorizationStatus", Convert.ToInt32(HttpStatusCode.Accepted).ToString());
                     }
                     else

@@ -33,6 +33,7 @@ namespace goOfflineE
             {
                 option.ConfigureSwaggerGen = new System.Action<Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions>(swagger =>
                 {
+                    swagger.OperationFilter<AddRequiredHeaderParameter>();
                     SwaggerUIConfigurations.SwaggerUIConfig(swagger);
                 });
             });
@@ -65,7 +66,7 @@ namespace goOfflineE
             services.AddTransient<ITenantService, TenantService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITableStorage, AzureTableStorage>();
+            services.AddScoped<ITableStorage, AzureTableStorage>();
             services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),
             new System.Net.Http.DelegatingHandler[] { }));
         }
