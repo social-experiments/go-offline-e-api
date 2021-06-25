@@ -1,7 +1,6 @@
 ﻿namespace goOfflineE.Repository
 {
     using goOfflineE.Common.Constants;
-    using goOfflineE.Services;
     using Microsoft.AspNetCore.Http;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
@@ -17,14 +16,19 @@
     public class AzureTableStorage : ITableStorage
     {
         /// <summary>
-        /// Defines the _client.
+        /// Defines the client.
         /// </summary>
-        private readonly CloudTableClient _client;
+        private CloudTableClient client;
 
         /// <summary>
         /// Defines the _tables.
         /// </summary>
         private ConcurrentDictionary<string, CloudTable> _tables;
+
+        /// <summary>
+        /// Gets or sets the Client.
+        /// </summary>
+        public CloudTableClient Client { get => client; set => client = value; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureTableStorage"/> class.
@@ -33,7 +37,7 @@
         /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
         public AzureTableStorage(IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider)
         {
-            string  tenantId = "";
+            string tenantId = "";
             var request = httpContextAccessor.HttpContext.Request;
             if (request != null && request.Headers.ContainsKey("Tenant"))
             {
@@ -41,18 +45,16 @@
             }
 
             CloudStorageAccount account = CloudStorageAccount.Parse(SettingConfigurations.AzureWebJobsStorage);
-            _client = account.CreateCloudTableClient();
+            Client = account.CreateCloudTableClient();
             _tables = new ConcurrentDictionary<string, CloudTable>();
             if (!String.IsNullOrEmpty(tenantId))
             {
                 var tenants = this.GetAllAsync<Entites.Tenant>("Tenants").Result;
                 var tenant = tenants.FirstOrDefault(t => t.RowKey == tenantId);
                 account = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
-                _client = account.CreateCloudTableClient();
+                Client = account.CreateCloudTableClient();
                 _tables = new ConcurrentDictionary<string, CloudTable>();
             }
-
-          
         }
 
         /// <summary>
@@ -238,7 +240,7 @@
         {
             if (!_tables.ContainsKey(tableName))
             {
-                var table = _client.GetTableReference(tableName);
+                var table = Client.GetTableReference(tableName);
                 await table.CreateIfNotExistsAsync().ConfigureAwait(false);
                 _tables[tableName] = table;
             }

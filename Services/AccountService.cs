@@ -8,6 +8,7 @@
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
@@ -72,6 +73,11 @@
         private readonly ISettingService _settingService;
 
         /// <summary>
+        /// Defines the _tenantService.
+        /// </summary>
+        private readonly ITenantService _tenantService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
@@ -82,6 +88,7 @@
         /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
         /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
         /// <param name="settingService">The settingService<see cref="ISettingService"/>.</param>
+        /// <param name="tenantService">The tenantService<see cref="ITenantService"/>.</param>
         /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
         public AccountService(ITableStorage tableStorage,
             ISchoolService schoolService,
@@ -91,6 +98,7 @@
             IAssessmentService assessmentService,
             IContentService contentService,
             ISettingService settingService,
+            ITenantService tenantService,
             IEmailService emailService)
         {
             _tableStorage = tableStorage;
@@ -102,6 +110,7 @@
             _assessmentService = assessmentService;
             _emailService = emailService;
             _settingService = settingService;
+            _tenantService = tenantService;
         }
 
         /// <summary>
@@ -126,7 +135,20 @@
 
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey, account.TenantId);
+            var tenant = await _tenantService.Get(account.TenantId);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+            _tableStorage.Client = storageAccount.CreateCloudTableClient();
 
+            string schoolId = "";
+
+            if (account.Role == Role.Teacher.ToString())
+            {
+                TableQuery<Entites.Teacher> query = new TableQuery<Entites.Teacher>()
+                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, account.RowKey));
+                var teacherQuery = await _tableStorage.QueryAsync<Entites.Teacher>("Teacher", query);
+                var teacher = teacherQuery.SingleOrDefault();
+                schoolId = teacher.PartitionKey;
+            }
             var response = new AuthenticateResponse
             {
                 Id = account.RowKey,
@@ -136,6 +158,7 @@
                 Role = account.Role,
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
                 TenantId = account.TenantId,
+                SchoolId = schoolId,
                 Token = jwtToken
             };
 
@@ -279,6 +302,7 @@
         /// The GenerateToken.
         /// </summary>
         /// <param name="userId">The userId<see cref="string"/>.</param>
+        /// <param name="tenantId">The tenantId<see cref="string"/>.</param>
         /// <returns>The <see cref="string"/>.</returns>
         public string GenerateToken(string userId, string tenantId)
         {
@@ -359,6 +383,7 @@
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Email = student.EnrolmentNo,
+                SchoolId = school.Id,
                 Role = Role.Student.ToString(),
                 Token = jwtToken
             };
