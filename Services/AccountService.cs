@@ -73,11 +73,6 @@
         private readonly ISettingService _settingService;
 
         /// <summary>
-        /// Defines the _tenantService.
-        /// </summary>
-        private readonly ITenantService _tenantService;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
@@ -88,7 +83,6 @@
         /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
         /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
         /// <param name="settingService">The settingService<see cref="ISettingService"/>.</param>
-        /// <param name="tenantService">The tenantService<see cref="ITenantService"/>.</param>
         /// <param name="emailService">The emailService<see cref="IEmailService"/>.</param>
         public AccountService(ITableStorage tableStorage,
             ISchoolService schoolService,
@@ -98,7 +92,6 @@
             IAssessmentService assessmentService,
             IContentService contentService,
             ISettingService settingService,
-            ITenantService tenantService,
             IEmailService emailService)
         {
             _tableStorage = tableStorage;
@@ -110,7 +103,6 @@
             _assessmentService = assessmentService;
             _emailService = emailService;
             _settingService = settingService;
-            _tenantService = tenantService;
         }
 
         /// <summary>
@@ -135,7 +127,8 @@
 
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey, account.TenantId);
-            var tenant = await _tenantService.Get(account.TenantId);
+            var dataTentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
+            var tenant = dataTentants.FirstOrDefault(t => t.RowKey == account.TenantId);
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
             _tableStorage.Client = storageAccount.CreateCloudTableClient();
 

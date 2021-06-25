@@ -137,7 +137,7 @@
         /// <returns>The <see cref="Task{Tenant}"/>.</returns>
         public async Task<Tenant> Get(string tentantId)
         {
-            var tenants = await this.GetAll();
+            var tenants = await GetAll();
             return tenants.FirstOrDefault(m => m.Id == tentantId);
         }
 
