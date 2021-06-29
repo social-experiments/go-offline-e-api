@@ -92,7 +92,7 @@
         public async Task CreateUpdate(Tenant tenant)
         {
             var tentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
-            var tenantData = tentants.FirstOrDefault(tenant => tenant.AccountKey == tenant.AccountKey);
+            var tenantData = tentants.FirstOrDefault(t => t.AccountKey == tenant.AccountKey);
 
             if (tenantData is null)
             {
