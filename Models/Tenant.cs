@@ -16,6 +16,11 @@
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the Email.
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
         /// Gets or sets the AzureWebJobsStorage.
         /// </summary>
         public string AzureWebJobsStorage { get; set; }

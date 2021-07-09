@@ -8,7 +8,10 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
+    using System.Web.Http;
 
     /// <summary>
     /// Defines the <see cref="TenantService" />.
@@ -56,6 +59,11 @@
         private readonly ISettingService _settingService;
 
         /// <summary>
+        /// Defines the _profileService.
+        /// </summary>
+        private readonly IProfileService _profileService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TenantService"/> class.
         /// </summary>
         /// <param name="tableStorage">The tableStorage<see cref="ITableStorage"/>.</param>
@@ -65,6 +73,7 @@
         /// <param name="classService">The classService<see cref="IClassService"/>.</param>
         /// <param name="assessmentService">The assessmentService<see cref="IAssessmentService"/>.</param>
         /// <param name="contentService">The contentService<see cref="IContentService"/>.</param>
+        /// <param name="profileService">The profileService<see cref="IProfileService"/>.</param>
         /// <param name="settingService">The settingService<see cref="ISettingService"/>.</param>
         public TenantService(ITableStorage tableStorage, ISchoolService schoolService,
             IMapper mapper,
@@ -72,6 +81,7 @@
             IClassService classService,
             IAssessmentService assessmentService,
             IContentService contentService,
+            IProfileService profileService,
             ISettingService settingService)
         {
             _tableStorage = tableStorage;
@@ -82,6 +92,7 @@
             _contentService = contentService;
             _assessmentService = assessmentService;
             _settingService = settingService;
+            _profileService = profileService;
         }
 
         /// <summary>
@@ -99,18 +110,20 @@
                 try
                 {
                     var rowKey = Guid.NewGuid().ToString();
-                    var newMenu = new Entites.Tenant(tenant.AccountKey, rowKey)
+                    var tenantDB = new Entites.Tenant(tenant.AccountKey, rowKey)
                     {
                         AccountKey = tenant.AccountKey,
                         AzureWebJobsStorage = tenant.AzureWebJobsStorage,
                         AzureBlobURL = tenant.AzureBlobURL,
                         Name = tenant.Name,
+                        Email = tenant.Email,
                         Active = true,
                         ApplicationSettings = tenant.ApplicationSettings,
                         CognitiveServiceEndPoint = tenant.CognitiveServiceEndPoint,
                         CognitiveServiceKey = tenant.CognitiveServiceKey
                     };
-                    await _tableStorage.AddAsync("Tenants", newMenu);
+                    await _tableStorage.AddAsync("Tenants", tenantDB);
+                    await CreateTenantAdminUser(rowKey, tenant.Name, tenant.Email);
                 }
                 catch (Exception ex)
                 {
@@ -159,19 +172,90 @@
         /// <returns>The <see cref="Task{DataResponse}"/>.</returns>
         public async Task<DataResponse> GetDataResponse(DataRequest requestData)
         {
-            var schools = requestData.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(requestData.SchoolId) : await _schoolService.GetAll();
-            var courseContent = await _contentService.GetAll();
-            var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
-            var associateMenu = await _settingService.GetMenus(requestData.Role);
+            var result = new DataResponse();
 
-            var result = new DataResponse
+            if (requestData.Role == Role.Student.ToString())
             {
-                Schools = schools.ToList(),
-                CourseContent = courseContent.ToList(),
-                AssessmentCategory = assessmentCategories,
-                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList()
+                var students = await _tableStorage.GetAllAsync<Entites.Student>("Student");
+                var student = students.SingleOrDefault(stud => stud.EnrolmentNo != null && stud.EnrolmentNo.ToLower() == requestData.EnrolmentNo.ToLower());
+
+                if (student == null)
+                {
+                    var resp = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                    {
+                        Content = new StringContent(string.Format("Invalid Enrolment Number!"))
+                    };
+                    throw new HttpResponseException(resp);
+                }
+
+                var studentRes = new StudentResponse
+                {
+                    Id = student.RowKey,
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    EnrolmentNo = student.EnrolmentNo,
+                    Address1 = student.Address1,
+                    Address2 = student.Address2,
+                    Country = student.Country,
+                    State = student.State,
+                    City = student.City,
+                    Zip = student.Zip,
+                    SchoolId = student.PartitionKey,
+                    ClassId = student.ClassId,
+                    ProfileStoragePath = student.ProfileStoragePath,
+                    TrainStudentModel = student.TrainStudentModel,
+                    Gender = student.Gender
+                };
+
+                var associateMenu = await _settingService.GetMenus("Student");
+                var courseContent = await _contentService.GetAll(student.PartitionKey, student.ClassId);
+                var school = await _schoolService.Get(student.PartitionKey);
+                var classRoom = await _classService.Get(student.ClassId);
+
+                classRoom.Students.Add(studentRes);
+                school.ClassRooms.Add(classRoom);
+
+                result.Schools.Add(school);
+                result.CourseContent = courseContent.ToList();
+                result.AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList();
+                return result;
+
+            }
+            else
+            {
+                var schools = requestData.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(requestData.SchoolId) : await _schoolService.GetAll();
+                var courseContent = await _contentService.GetAll();
+                var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
+                var associateMenu = await _settingService.GetMenus(requestData.Role);
+
+
+                result.Schools = schools.ToList();
+                result.CourseContent = courseContent.ToList();
+                result.AssessmentCategory = assessmentCategories;
+                result.AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList();
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// The CreateTenantAdminUser.
+        /// </summary>
+        /// <param name="tenantId">The tenantId<see cref="string"/>.</param>
+        /// <param name="name">The name<see cref="string"/>.</param>
+        /// <param name="email">The email<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task CreateTenantAdminUser(string tenantId, string name, string email)
+        {
+            var newTenantAdminUser = new RegisterRequest()
+            {
+                Email = email,
+                FirstName = name,
+                Role = Role.SuperAdmin.ToString(),
+                AcceptTerms = true,
+                TenantId = tenantId
+
             };
-            return result;
+            await _profileService.Register(newTenantAdminUser);
         }
     }
 }

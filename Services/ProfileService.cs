@@ -127,7 +127,7 @@
                 throw new HttpResponseException(resp);
             }
 
-            var defaultPasswrod = model.Password ?? "p@ssw0rd";
+            var defaultPasswrod = model.Password ?? "test@123";
             var userId = model.Id ?? Guid.NewGuid().ToString();
             var schoolId = model.SchoolId ?? userId;
 
@@ -144,7 +144,8 @@
                 CreatedBy = userId,
                 UpdatedOn = DateTime.UtcNow,
                 UpdatedBy = userId,
-                ForceChangePasswordNextLogin = true
+                ForceChangePasswordNextLogin = true,
+                TenantId = model.TenantId
             };
 
             try

@@ -127,10 +127,13 @@
 
             // authentication successful so generate jwt
             var jwtToken = GenerateToken(account.RowKey, account.TenantId);
-            var dataTentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
-            var tenant = dataTentants.FirstOrDefault(t => t.RowKey == account.TenantId);
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
-            _tableStorage.Client = storageAccount.CreateCloudTableClient();
+            if(!String.IsNullOrEmpty(account.TenantId))
+            {
+                var dataTentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
+                var tenant = dataTentants.FirstOrDefault(t => t.RowKey == account.TenantId);
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+                _tableStorage.Client = storageAccount.CreateCloudTableClient();
+            }
 
             string schoolId = "";
 
@@ -378,7 +381,8 @@
                 Email = student.EnrolmentNo,
                 SchoolId = school.Id,
                 Role = Role.Student.ToString(),
-                Token = jwtToken
+                Token = jwtToken,
+                TenantId = student.TenantId
             };
 
             return response;

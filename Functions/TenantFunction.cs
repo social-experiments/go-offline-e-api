@@ -9,6 +9,7 @@ namespace goOfflineE.Functions
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
     using Newtonsoft.Json;
+    using NSwag.Annotations;
     using System.IO;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -73,6 +74,22 @@ namespace goOfflineE.Functions
             DataRequest requestData = JsonConvert.DeserializeObject<DataRequest>(requestBody);
 
             var response = await _tenantService.GetDataResponse(requestData);
+
+            return new OkObjectResult(response);
+        }
+
+        [FunctionName("TenantList")]
+        [OpenApiOperation("List", "Tenant")]
+        public async Task<IActionResult> TeacherList(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "tenants")] HttpRequest req)
+        {
+            var validateStatus = base.AuthorizationStatus(req);
+            if (validateStatus != System.Net.HttpStatusCode.Accepted)
+            {
+                return new BadRequestObjectResult(validateStatus);
+            }
+
+            var response = await _tenantService.GetAll();
 
             return new OkObjectResult(response);
         }

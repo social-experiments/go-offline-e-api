@@ -6,6 +6,10 @@ namespace goOfflineE.Common.Enums
     public enum Role
     {
         /// <summary>
+        /// Defines the NonProfitAdmin.
+        /// </summary>
+        NonProfitAdmin,
+        /// <summary>
         /// Defines the SuperAdmin.
         /// </summary>
         SuperAdmin,
