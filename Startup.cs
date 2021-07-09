@@ -10,6 +10,7 @@ namespace goOfflineE
     using goOfflineE.Helpers;
     using goOfflineE.Repository;
     using goOfflineE.Services;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Azure.CognitiveServices.Vision.Face;
     using Microsoft.Azure.Functions.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +33,11 @@ namespace goOfflineE
             {
                 option.ConfigureSwaggerGen = new System.Action<Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions>(swagger =>
                 {
+                    swagger.OperationFilter<AddRequiredHeaderParameter>();
                     SwaggerUIConfigurations.SwaggerUIConfig(swagger);
                 });
             });
-
+            builder.Services.AddHttpContextAccessor();
             ConfigureServices(builder.Services);
         }
 
@@ -61,8 +63,10 @@ namespace goOfflineE
             services.AddTransient<IAssessmentService, AssessmentService>();
             services.AddTransient<IPushNotificationService, PushNotificationService>();
             services.AddTransient<ISettingService, SettingService>();
+            services.AddTransient<ITenantService, TenantService>();
 
-            services.AddSingleton<ITableStorage, AzureTableStorage>(s => new AzureTableStorage(SettingConfigurations.AzureWebJobsStorage));
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<ITableStorage, AzureTableStorage>();
             services.AddSingleton<IFaceClient, FaceClient>(s => new FaceClient(new ApiKeyServiceClientCredentials(SettingConfigurations.CognitiveServiceKey),
             new System.Net.Http.DelegatingHandler[] { }));
         }

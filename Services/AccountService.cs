@@ -8,6 +8,7 @@
     using goOfflineE.Models;
     using goOfflineE.Repository;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Collections.Generic;
@@ -125,14 +126,25 @@
             }
 
             // authentication successful so generate jwt
-            var jwtToken = GenerateToken(account.RowKey);
+            var jwtToken = GenerateToken(account.RowKey, account.TenantId);
+            if(!String.IsNullOrEmpty(account.TenantId))
+            {
+                var dataTentants = await _tableStorage.GetAllAsync<Entites.Tenant>("Tenants");
+                var tenant = dataTentants.FirstOrDefault(t => t.RowKey == account.TenantId);
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tenant.AzureWebJobsStorage);
+                _tableStorage.Client = storageAccount.CreateCloudTableClient();
+            }
 
-            var schools = account.Role == Role.Teacher.ToString() ? await _schoolService.GetAll(account.PartitionKey) : await _schoolService.GetAll();
-            var courseContent = await _contentService.GetAll();
-            var assessmentCategories = await _assessmentService.GetAssessmentSubjects();
+            string schoolId = "";
 
-            var associateMenu = await _settingService.GetMenus(account.Role);
-
+            if (account.Role == Role.Teacher.ToString())
+            {
+                TableQuery<Entites.Teacher> query = new TableQuery<Entites.Teacher>()
+                  .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, account.RowKey));
+                var teacherQuery = await _tableStorage.QueryAsync<Entites.Teacher>("Teacher", query);
+                var teacher = teacherQuery.SingleOrDefault();
+                schoolId = teacher.PartitionKey;
+            }
             var response = new AuthenticateResponse
             {
                 Id = account.RowKey,
@@ -140,11 +152,9 @@
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Role = account.Role,
-                Schools = schools.ToList(),
-                CourseContent = courseContent.ToList(),
-                AssessmentCategory = assessmentCategories,
-                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
                 ForceChangePasswordNextLogin = account.ForceChangePasswordNextLogin,
+                TenantId = account.TenantId,
+                SchoolId = schoolId,
                 Token = jwtToken
             };
 
@@ -288,8 +298,9 @@
         /// The GenerateToken.
         /// </summary>
         /// <param name="userId">The userId<see cref="string"/>.</param>
+        /// <param name="tenantId">The tenantId<see cref="string"/>.</param>
         /// <returns>The <see cref="string"/>.</returns>
-        public string GenerateToken(string userId)
+        public string GenerateToken(string userId, string tenantId)
         {
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SettingConfigurations.IssuerToken));
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -299,6 +310,7 @@
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, userId),
+                     new Claim(ClaimTypes.GroupSid, tenantId ?? ""),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = SettingConfigurations.Issuer,
@@ -331,7 +343,7 @@
             }
 
             // authentication successful so generate jwt
-            var jwtToken = GenerateToken(student.RowKey);
+            var jwtToken = GenerateToken(student.RowKey, student.TenantId);
 
             var studentRes = new StudentResponse
             {
@@ -367,13 +379,11 @@
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Email = student.EnrolmentNo,
+                SchoolId = school.Id,
                 Role = Role.Student.ToString(),
-                CourseContent = courseContent?.ToList(),
-                AssociateMenu = associateMenu?.Select(menu => menu.Id).ToList(),
-                Token = jwtToken
+                Token = jwtToken,
+                TenantId = student.TenantId
             };
-
-            response.Schools.Add(school);
 
             return response;
         }

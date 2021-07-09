@@ -77,5 +77,7 @@
         /// <param name="entity">The entity<see cref="ITableEntity"/>.</param>
         /// <returns>The <see cref="Task{object}"/>.</returns>
         Task<object> UpdateAsync(string tableName, ITableEntity entity);
+
+        CloudTableClient Client { get; set; }
     }
 }

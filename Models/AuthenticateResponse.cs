@@ -1,7 +1,5 @@
 namespace goOfflineE.Models
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Defines the <see cref="AuthenticateResponse" />.
     /// </summary>
@@ -12,36 +10,12 @@ namespace goOfflineE.Models
         /// </summary>
         public AuthenticateResponse()
         {
-            this.Schools = new List<School>();
-            this.CourseContent = new List<Content>();
-            this.AssessmentCategory = new List<string>();
-            this.AssociateMenu = new List<string>();
         }
 
         /// <summary>
         /// Gets or sets the Id.
         /// </summary>
         public string Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Schools.
-        /// </summary>
-        public List<School> Schools { get; set; }
-
-        /// <summary>
-        /// Gets or sets the AssessmentCategory.
-        /// </summary>
-        public List<string> AssessmentCategory { get; set; }
-
-        /// <summary>
-        /// Gets or sets the AssociateMenu.
-        /// </summary>
-        public List<string> AssociateMenu { get; set; }
-
-        /// <summary>
-        /// Gets or sets the CourseContent.
-        /// </summary>
-        public List<Content> CourseContent { get; set; }
 
         /// <summary>
         /// Gets or sets the FirstName.
@@ -72,6 +46,16 @@ namespace goOfflineE.Models
         /// Gets or sets the Token.
         /// </summary>
         public string Token { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TenantId.
+        /// </summary>
+        public string TenantId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SchoolId.
+        /// </summary>
+        public string SchoolId { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether ForceChangePasswordNextLogin.
